@@ -12,7 +12,7 @@ outputs:
     description: "Placeholder output to be replaced by real outputs"
 
 runs:
-  using: node20
+  using: node24
   main: dist/index.js
 
 # https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#branding
