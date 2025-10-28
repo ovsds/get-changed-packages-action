@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "get-changed-python-packages-action",
+  "name": "get-changed-packages-action",
   "main": "lib/main.js",
   "dependencies": {
     "@actions/core": "1.11.1"
