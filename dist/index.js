@@ -24,11 +24,21 @@ class Action {
     constructor(actionOptions) {
         this.options = actionOptions;
     }
+    getChangedPackages(changedFiles, packageDirectoryRegex) {
+        return Array.from(new Set(changedFiles
+            .map((file) => {
+            const match = file.match(packageDirectoryRegex);
+            return match ? match[0] : null;
+        })
+            .filter((directory) => directory !== null)));
+    }
     run() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.options.logger(`Running with placeholder: ${this.options.placeholder}`);
+            const changedPackages = this.getChangedPackages(this.options.changedFiles, this.options.packageDirectoryRegex);
+            this.options.logger(`Found ${changedPackages.length} changed packages:`);
+            this.options.logger(changedPackages.join("\n"));
             return {
-                placeholder: this.options.placeholder,
+                changedPackages,
             };
         });
     }
@@ -47,8 +57,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseActionInput = parseActionInput;
 const parse_1 = __nccwpck_require__(789);
 function parseActionInput(raw) {
+    const changedFilesSeparator = (0, parse_1.parseNonEmptyString)(raw.changedFilesSeparator);
     return {
-        placeholder: (0, parse_1.parseNonEmptyString)(raw.placeholder),
+        changedFiles: (0, parse_1.parseListOfStrings)(raw.changedFiles, changedFilesSeparator),
+        packageDirectoryRegex: (0, parse_1.parseRegex)(raw.packageDirectoryRegex),
+        changedPackagesSeparator: (0, parse_1.parseNonEmptyString)(raw.changedPackagesSeparator),
     };
 }
 
@@ -75,19 +88,22 @@ const action_1 = __nccwpck_require__(1536);
 const input_1 = __nccwpck_require__(2868);
 function getActionInput() {
     return (0, input_1.parseActionInput)({
-        placeholder: (0, core_1.getInput)("placeholder"),
+        changedFiles: (0, core_1.getInput)("changed-files"),
+        changedFilesSeparator: (0, core_1.getInput)("changed-files-separator", { trimWhitespace: false }),
+        packageDirectoryRegex: (0, core_1.getInput)("package-directory-regex"),
+        changedPackagesSeparator: (0, core_1.getInput)("changed-packages-separator", { trimWhitespace: false }),
     });
 }
-function setActionOutput(actionResult) {
+function setActionOutput(actionResult, changedPackagesSeparator) {
     (0, core_1.info)(`Action result: ${JSON.stringify(actionResult)}`);
-    (0, core_1.setOutput)("placeholder", actionResult.placeholder);
+    (0, core_1.setOutput)("changed-packages", actionResult.changedPackages.join(changedPackagesSeparator));
 }
 function _main() {
     return __awaiter(this, void 0, void 0, function* () {
         const actionInput = getActionInput();
         const actionInstance = action_1.Action.fromOptions(Object.assign(Object.assign({}, actionInput), { logger: core_1.info }));
         const actionResult = yield actionInstance.run();
-        setActionOutput(actionResult);
+        setActionOutput(actionResult, actionInput.changedPackagesSeparator);
     });
 }
 function main() {
@@ -116,17 +132,33 @@ main();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseNonEmptyString = void 0;
+exports.parseRegex = exports.parseListOfStrings = exports.parseNonEmptyString = void 0;
 const parseNonEmptyString = (value) => {
-    if (!value) {
-        throw new Error(`Invalid ${value}, must be a non-empty string`);
-    }
-    if (value.trim() === "") {
+    if (value === undefined || value === "") {
         throw new Error(`Invalid ${value}, must be a non-empty string`);
     }
     return value;
 };
 exports.parseNonEmptyString = parseNonEmptyString;
+const parseListOfStrings = (value, separator) => {
+    if (value === undefined || value === "") {
+        return [];
+    }
+    return value.split(separator);
+};
+exports.parseListOfStrings = parseListOfStrings;
+const parseRegex = (value) => {
+    if (value === undefined || value === "") {
+        throw new Error(`Invalid ${value}, must be a valid regex`);
+    }
+    try {
+        return new RegExp(value);
+    }
+    catch (error) {
+        throw new Error(`Invalid ${value}, must be a valid regex`);
+    }
+};
+exports.parseRegex = parseRegex;
 
 
 /***/ }),

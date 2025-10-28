@@ -2,14 +2,24 @@ name: "Get Changed Packages"
 description: "Action to get changed packages using list of changed files."
 
 inputs:
-  placeholder:
-    description: "Placeholder input to be replaced by real inputs"
+  changed-files:
+    description: "List of changed files."
     required: true
-    default: "placeholder"
+  changed-files-separator:
+    description: "Separator to split changed files."
+    required: true
+    default: "\n"
+  package-directory-regex:
+    description: "Regex pattern to match package directories."
+    required: true
+  changed-packages-separator:
+    description: "Separator to split changed packages."
+    required: true
+    default: "\n"
 
 outputs:
-  placeholder:
-    description: "Placeholder output to be replaced by real outputs"
+  changed-packages:
+    description: "List of changed packages."
 
 runs:
   using: node24

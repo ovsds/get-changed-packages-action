@@ -3,7 +3,10 @@ import { describe, expect, test } from "vitest";
 import { RawActionInput, parseActionInput } from "../../src/input";
 
 const defaultRawInput = {
-  placeholder: "test_placeholder",
+  changedFiles: "test_changed_file\ntest_changed_file_2",
+  changedFilesSeparator: "\n",
+  packageDirectoryRegex: ".*",
+  changedPackagesSeparator: "\n",
 };
 
 function createRawInput(overrides: Partial<RawActionInput> = {}): RawActionInput {
@@ -16,11 +19,21 @@ function createRawInput(overrides: Partial<RawActionInput> = {}): RawActionInput
 describe("Input tests", () => {
   test("parses raw input correctly", () => {
     expect(parseActionInput(createRawInput())).toEqual({
-      placeholder: "test_placeholder",
+      changedFiles: ["test_changed_file", "test_changed_file_2"],
+      packageDirectoryRegex: new RegExp(".*"),
+      changedPackagesSeparator: "\n",
     });
   });
 
-  test("throws error when placeholder is empty", () => {
-    expect(() => parseActionInput(createRawInput({ placeholder: "" })).placeholder).toThrowError();
+  test("empty changed files returns empty array", () => {
+    expect(parseActionInput(createRawInput({ changedFiles: "" }))).toEqual({
+      changedFiles: [],
+      packageDirectoryRegex: new RegExp(".*"),
+      changedPackagesSeparator: "\n",
+    });
+  });
+
+  test("empty package directory regex throws error", () => {
+    expect(() => parseActionInput(createRawInput({ packageDirectoryRegex: "" }))).toThrowError();
   });
 });
