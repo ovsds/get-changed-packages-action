@@ -88,9 +88,9 @@ tasks:
         --overwrite-if-exists
         --output-dir ../
         {{.TEMPLATE_PATH}}
-        project_name='Get Changed Python Packages Action'
-        project_slug='get-changed-python-packages-action'
-        marketplace_name='Get Changed Python Packages'
+        project_name='Get Changed Packages Action'
+        project_slug='get-changed-packages-action'
+        marketplace_name='Get Changed Packages'
         action_type='node'
         node_version='v24.11.0'
         owner_name='Dmitry Ovsiannikov'

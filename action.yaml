@@ -1,5 +1,5 @@
-name: "Get Changed Python Packages"
-description: "Get Changed Python Packages Action"
+name: "Get Changed Packages"
+description: "Action to get changed packages using list of changed files."
 
 inputs:
   placeholder:

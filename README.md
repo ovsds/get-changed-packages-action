@@ -1,9 +1,9 @@
-# Get Changed Python Packages Action
+# Get Changed Packages Action
 
-[![CI](https://github.com/ovsds/get-changed-python-packages-action/workflows/Check%20PR/badge.svg)](https://github.com/ovsds/get-changed-python-packages-action/actions?query=workflow%3A%22%22Check+PR%22%22)
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Get%20Changed%20Python%20Packages-blue.svg)](https://github.com/marketplace/actions/get-changed-python-packages)
+[![CI](https://github.com/ovsds/get-changed-packages-action/workflows/Check%20PR/badge.svg)](https://github.com/ovsds/get-changed-packages-action/actions?query=workflow%3A%22%22Check+PR%22%22)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Get%20Changed%20Packages-blue.svg)](https://github.com/marketplace/actions/get-changed-packages)
 
-This action is used to get the changed Python packages using list of changed files.
+Action to get changed packages using list of changed files.
 
 ## Usage
 
@@ -11,7 +11,7 @@ This action is used to get the changed Python packages using list of changed fil
 
 ```yaml
 jobs:
-  get-changed-python-packages:
+  get-changed-packages:
     permissions:
       contents: read
 
@@ -24,9 +24,9 @@ jobs:
           sha: ${{ github.event.pull_request.head.sha }}
           separator: "\n"
 
-      - name: Get Changed Python Packages
-        id: get-changed-python-packages
-        uses: ovsds/get-changed-python-packages-action@v1
+      - name: Get Changed Packages
+        id: get-changed-packages
+        uses: ovsds/get-changed-packages-action@v1
         with:
           changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
           package-directory-regex: "packages/.*/"
