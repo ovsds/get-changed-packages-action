@@ -1,0 +1,56 @@
+name: Check PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup_environment
+        with:
+          zizmor-enabled: true
+
+      - name: Install Dependencies
+        run: |
+          task init
+
+      - name: Lint PR
+        run: |
+          task lint
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for Zizmor
+
+      - name: Test PR
+        run: |
+          task test
+
+      - name: Package PR
+        run: |
+          task package
+
+      - name: Compare the expected and actual dist/ directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build.  See status below:"
+            git diff
+            exit 1
+          fi
