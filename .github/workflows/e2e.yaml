@@ -44,8 +44,8 @@ jobs:
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
-            src/package1
-            src/package2
+            ${{ github.workspace }}/src/package1
+            ${{ github.workspace }}/src/package2
 
   e2e-changed-files-separator:
     runs-on: ubuntu-latest
@@ -75,8 +75,8 @@ jobs:
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
-            src/package1
-            src/package2
+            ${{ github.workspace }}/src/package1
+            ${{ github.workspace }}/src/package2
 
   e2e-all-packages-separator:
     runs-on: ubuntu-latest
@@ -108,8 +108,8 @@ jobs:
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
-            src/package1
-            src/package2
+            ${{ github.workspace }}/src/package1
+            ${{ github.workspace }}/src/package2
 
   e2e-changed-packages-separator:
     runs-on: ubuntu-latest
@@ -143,7 +143,7 @@ jobs:
         uses: nick-fields/assert-action@v2
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
-          expected: src/package1,src/package2
+          expected: ${{ github.workspace }}/src/package1,${{ github.workspace }}/src/package2
 
   e2e-method-all:
     runs-on: ubuntu-latest
@@ -173,8 +173,43 @@ jobs:
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
-            src/package1
-            src/package2
+            ${{ github.workspace }}/src/package1
+            ${{ github.workspace }}/src/package2
+
+  e2e-method-poetry-path:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Test Run
+        id: test-run
+        uses: ./
+        with:
+          changed-files: |
+            ./tests/data/poetry-path/default/parent/file.ts
+          all-packages: |
+            ./tests/data/poetry-path/default/parent
+            ./tests/data/poetry-path/default/child
+            ./tests/data/poetry-path/default/grandchild
+            ./tests/data/poetry-path/default/independent
+          package-dependencies-resolution-method: poetry-path
+
+      - name: Assert changed-packages
+        uses: nick-fields/assert-action@v2
+        with:
+          actual: ${{ steps.test-run.outputs.changed-packages }}
+          expected: |
+            ${{ github.workspace }}/tests/data/poetry-path/default/parent
+            ${{ github.workspace }}/tests/data/poetry-path/default/child
+            ${{ github.workspace }}/tests/data/poetry-path/default/grandchild
+
   e2e:
     runs-on: ubuntu-latest
     if: always() && !cancelled()
@@ -185,6 +220,7 @@ jobs:
       - e2e-all-packages-separator
       - e2e-changed-packages-separator
       - e2e-method-all
+      - e2e-method-poetry-path
 
     steps:
       - name: Collect Results

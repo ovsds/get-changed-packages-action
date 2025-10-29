@@ -1,0 +1,4 @@
+[tool.poetry.dependencies]
+parent = { path = "../package1" }
+python = "*"
+

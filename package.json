@@ -3,19 +3,20 @@
   "name": "get-changed-packages-action",
   "main": "lib/main.js",
   "dependencies": {
-    "@actions/core": "1.11.1"
+    "@actions/core": "1.11.1",
+    "toml": "3.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.0.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@types/node": "^24.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@vercel/ncc": "^0.38.0",
     "eslint": "^9.0.0",
-    "vitest": "^4.0.0",
-    "@commitlint/cli": "^20.0.0",
-    "@commitlint/config-conventional": "^20.0.0",
     "husky": "^9.0.0",
     "lint-staged": "^16.0.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "vitest": "^4.0.0"
   },
   "hooks": {
     "pre-commit": "lint-staged",
@@ -37,7 +38,8 @@
     "lint:fix": "npm run lint:fix:prettier && npm run lint:fix:eslint",
     "lint:fix:eslint": "eslint . --fix",
     "lint:fix:prettier": "prettier --write .",
-    "test": "vitest --printConsoleTrace=true",
+    "test": "vitest",
+    "test:debug": "vitest --printConsoleTrace=true",
     "test:unit": "vitest tests/unit",
     "test:integration": "vitest tests/integration",
     "build": "tsc",

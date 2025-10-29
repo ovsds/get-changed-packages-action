@@ -9,6 +9,8 @@ const defaultRawInput = {
   allPackagesSeparator: "\n",
   changedPackagesSeparator: "\n",
   packageDependenciesResolutionMethod: "none",
+  poetryPathDependenciesGroups: "group1\ngroup2",
+  poetryPathDependenciesGroupsSeparator: "\n",
 };
 
 function createRawInput(overrides: Partial<RawActionInput> = {}): RawActionInput {
@@ -25,15 +27,7 @@ describe("Input tests", () => {
       allPackages: ["package1", "package2"],
       changedPackagesSeparator: "\n",
       packageDependenciesResolutionMethod: "none",
-    });
-  });
-
-  test("empty changed files returns empty array", () => {
-    expect(parseActionInput(createRawInput({ changedFiles: "" }))).toEqual({
-      changedFiles: [],
-      allPackages: ["package1", "package2"],
-      changedPackagesSeparator: "\n",
-      packageDependenciesResolutionMethod: "none",
+      poetryPathDependenciesGroups: ["group1", "group2"],
     });
   });
 

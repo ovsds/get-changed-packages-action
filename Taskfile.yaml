@@ -51,6 +51,12 @@ tasks:
       - task: _with_nvm
         vars: { COMMAND: "npm run test" }
 
+  test-debug:
+    desc: Test project with debug
+    cmds:
+      - task: _with_nvm
+        vars: { COMMAND: "npm run test:debug" }
+
   package:
     desc: Pack project
     cmds:
