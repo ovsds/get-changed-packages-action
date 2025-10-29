@@ -1,7 +1,7 @@
 # Get Changed Packages Action
 
 [![CI](https://github.com/ovsds/get-changed-packages-action/workflows/Check%20PR/badge.svg)](https://github.com/ovsds/get-changed-packages-action/actions?query=workflow%3A%22%22Check+PR%22%22)
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Get%20Changed%20Packages-blue.svg)](https://github.com/marketplace/actions/get-changed-packages)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Get%20Changed%20Package%20List-blue.svg)](https://github.com/marketplace/actions/get-changed-package-list)
 
 Action to get changed packages using list of changed files.
 
