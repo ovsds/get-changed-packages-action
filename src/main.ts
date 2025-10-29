@@ -5,13 +5,16 @@ import { ActionInput, parseActionInput } from "./input";
 
 function getActionInput(): ActionInput {
   return parseActionInput({
-    placeholder: getInput("placeholder"),
+    changedFiles: getInput("changed-files"),
+    changedFilesSeparator: getInput("changed-files-separator", { trimWhitespace: false }),
+    packageDirectoryRegex: getInput("package-directory-regex"),
+    changedPackagesSeparator: getInput("changed-packages-separator", { trimWhitespace: false }),
   });
 }
 
-function setActionOutput(actionResult: ActionResult): void {
+function setActionOutput(actionResult: ActionResult, changedPackagesSeparator: string): void {
   info(`Action result: ${JSON.stringify(actionResult)}`);
-  setOutput("placeholder", actionResult.placeholder);
+  setOutput("changed-packages", actionResult.changedPackages.join(changedPackagesSeparator));
 }
 
 async function _main(): Promise<void> {
@@ -21,7 +24,7 @@ async function _main(): Promise<void> {
     logger: info,
   });
   const actionResult = await actionInstance.run();
-  setActionOutput(actionResult);
+  setActionOutput(actionResult, actionInput.changedPackagesSeparator);
 }
 
 async function main(): Promise<void> {

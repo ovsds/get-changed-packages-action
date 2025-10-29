@@ -28,13 +28,22 @@ jobs:
         id: test-run
         uses: ./
         with:
-          placeholder: "test_placeholder"
+          changed-files: |
+            src/package1/file.ts
+            src/package1/file2.ts
+            src/package2/file.ts
+            other/file.ts
+            other/src/package4/file.ts
+          package-directory-regex: "^src/[^/]*/"
 
       - name: Assert placeholder
         uses: nick-fields/assert-action@v2
         with:
-          actual: ${{ steps.test-run.outputs.placeholder }}
-          expected: "test_placeholder"
+          actual: ${{ steps.test-run.outputs.changed-packages }}
+          expected: |
+            src/package1/
+            src/package2/
+
   e2e:
     runs-on: ubuntu-latest
     if: always() && !cancelled()

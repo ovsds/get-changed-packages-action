@@ -1,15 +1,24 @@
-import { parseNonEmptyString } from "./utils/parse";
+import { parseListOfStrings, parseNonEmptyString, parseRegex } from "./utils/parse";
 
 export interface RawActionInput {
-  placeholder: string;
+  changedFiles: string;
+  changedFilesSeparator: string;
+  packageDirectoryRegex: string;
+  changedPackagesSeparator: string;
 }
 
 export interface ActionInput {
-  placeholder: string;
+  changedFiles: string[];
+  packageDirectoryRegex: RegExp;
+  changedPackagesSeparator: string;
 }
 
 export function parseActionInput(raw: RawActionInput): ActionInput {
+  const changedFilesSeparator = parseNonEmptyString(raw.changedFilesSeparator);
+
   return {
-    placeholder: parseNonEmptyString(raw.placeholder),
+    changedFiles: parseListOfStrings(raw.changedFiles, changedFilesSeparator),
+    packageDirectoryRegex: parseRegex(raw.packageDirectoryRegex),
+    changedPackagesSeparator: parseNonEmptyString(raw.changedPackagesSeparator),
   };
 }

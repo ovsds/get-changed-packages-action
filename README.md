@@ -34,10 +34,12 @@ jobs:
 
 ### Action Inputs
 
-| Name                      | Description                                 | Default |
-| ------------------------- | ------------------------------------------- | ------- |
-| `changed-files`           | List of changed files.                      |         |
-| `package-directory-regex` | Regex pattern to match package directories. |         |
+| Name                         | Description                                 | Default |
+| ---------------------------- | ------------------------------------------- | ------- |
+| `changed-files`              | List of changed files.                      |         |
+| `changed-files-separator`    | Separator to split changed files.           | "\n"    |
+| `package-directory-regex`    | Regex pattern to match package directories. |         |
+| `changed-packages-separator` | Separator to split changed packages.        | "\n"    |
 
 ### Action Outputs
 
