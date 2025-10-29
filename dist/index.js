@@ -32,13 +32,22 @@ class Action {
         })
             .filter((directory) => directory !== null)));
     }
+    getChangedPackagesWithDependencies(changedPackages, packageDependenciesResolutionMethod) {
+        switch (packageDependenciesResolutionMethod) {
+            case "none":
+                return changedPackages;
+            default:
+                throw new Error(`Unsupported package dependencies resolution method: ${packageDependenciesResolutionMethod}`);
+        }
+    }
     run() {
         return __awaiter(this, void 0, void 0, function* () {
             const changedPackages = this.getChangedPackages(this.options.changedFiles, this.options.packageDirectoryRegex);
             this.options.logger(`Found ${changedPackages.length} changed packages:`);
             this.options.logger(changedPackages.join("\n"));
+            const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages, this.options.packageDependenciesResolutionMethod);
             return {
-                changedPackages,
+                changedPackages: changedPackagesWithDependencies,
             };
         });
     }
@@ -56,12 +65,14 @@ exports.Action = Action;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseActionInput = parseActionInput;
 const parse_1 = __nccwpck_require__(789);
+const models_1 = __nccwpck_require__(6324);
 function parseActionInput(raw) {
     const changedFilesSeparator = (0, parse_1.parseNonEmptyString)(raw.changedFilesSeparator);
     return {
         changedFiles: (0, parse_1.parseListOfStrings)(raw.changedFiles, changedFilesSeparator),
         packageDirectoryRegex: (0, parse_1.parseRegex)(raw.packageDirectoryRegex),
         changedPackagesSeparator: (0, parse_1.parseNonEmptyString)(raw.changedPackagesSeparator),
+        packageDependenciesResolutionMethod: (0, models_1.parsePackageDependenciesResolutionMethod)(raw.packageDependenciesResolutionMethod),
     };
 }
 
@@ -92,6 +103,7 @@ function getActionInput() {
         changedFilesSeparator: (0, core_1.getInput)("changed-files-separator", { trimWhitespace: false }),
         packageDirectoryRegex: (0, core_1.getInput)("package-directory-regex"),
         changedPackagesSeparator: (0, core_1.getInput)("changed-packages-separator", { trimWhitespace: false }),
+        packageDependenciesResolutionMethod: (0, core_1.getInput)("package-dependencies-resolution-method"),
     });
 }
 function setActionOutput(actionResult, changedPackagesSeparator) {
@@ -122,6 +134,27 @@ function main() {
     });
 }
 main();
+
+
+/***/ }),
+
+/***/ 6324:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.parsePackageDependenciesResolutionMethod = exports.packageDependenciesResolutionMethods = void 0;
+const parse_1 = __nccwpck_require__(789);
+exports.packageDependenciesResolutionMethods = ["none"];
+const parsePackageDependenciesResolutionMethod = (value) => {
+    value = (0, parse_1.parseNonEmptyString)(value);
+    if (!exports.packageDependenciesResolutionMethods.includes(value)) {
+        throw new Error(`Invalid package dependencies resolution method: ${value}`);
+    }
+    return value;
+};
+exports.parsePackageDependenciesResolutionMethod = parsePackageDependenciesResolutionMethod;
 
 
 /***/ }),

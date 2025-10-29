@@ -7,6 +7,7 @@ const defaultRawInput = {
   changedFilesSeparator: "\n",
   packageDirectoryRegex: ".*",
   changedPackagesSeparator: "\n",
+  packageDependenciesResolutionMethod: "none",
 };
 
 function createRawInput(overrides: Partial<RawActionInput> = {}): RawActionInput {
@@ -22,6 +23,7 @@ describe("Input tests", () => {
       changedFiles: ["test_changed_file", "test_changed_file_2"],
       packageDirectoryRegex: new RegExp(".*"),
       changedPackagesSeparator: "\n",
+      packageDependenciesResolutionMethod: "none",
     });
   });
 
@@ -30,10 +32,15 @@ describe("Input tests", () => {
       changedFiles: [],
       packageDirectoryRegex: new RegExp(".*"),
       changedPackagesSeparator: "\n",
+      packageDependenciesResolutionMethod: "none",
     });
   });
 
   test("empty package directory regex throws error", () => {
     expect(() => parseActionInput(createRawInput({ packageDirectoryRegex: "" }))).toThrowError();
+  });
+
+  test("empty package dependencies resolution method throws error", () => {
+    expect(() => parseActionInput(createRawInput({ packageDependenciesResolutionMethod: "" }))).toThrowError();
   });
 });

@@ -9,6 +9,7 @@ function getActionInput(): ActionInput {
     changedFilesSeparator: getInput("changed-files-separator", { trimWhitespace: false }),
     packageDirectoryRegex: getInput("package-directory-regex"),
     changedPackagesSeparator: getInput("changed-packages-separator", { trimWhitespace: false }),
+    packageDependenciesResolutionMethod: getInput("package-dependencies-resolution-method"),
   });
 }
 
