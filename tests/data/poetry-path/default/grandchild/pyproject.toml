@@ -1,0 +1,4 @@
+[tool.poetry.dependencies]
+child = { path = "../child" }
+python = "*"
+

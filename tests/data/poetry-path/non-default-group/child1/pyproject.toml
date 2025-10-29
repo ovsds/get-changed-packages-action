@@ -1,0 +1,3 @@
+[tool.poetry.group.group1.dependencies]
+parent = { path = "../parent" }
+

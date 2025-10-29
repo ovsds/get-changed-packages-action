@@ -11,6 +11,11 @@ function getActionInput(): ActionInput {
     allPackagesSeparator: getInput("all-packages-separator", { trimWhitespace: false, required: true }),
     changedPackagesSeparator: getInput("changed-packages-separator", { trimWhitespace: false, required: true }),
     packageDependenciesResolutionMethod: getInput("package-dependencies-resolution-method", { required: true }),
+    poetryPathDependenciesGroups: getInput("poetry-path-dependencies-groups", { required: true }),
+    poetryPathDependenciesGroupsSeparator: getInput("poetry-path-dependencies-groups-separator", {
+      trimWhitespace: false,
+      required: true,
+    }),
   });
 }
 

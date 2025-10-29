@@ -34,20 +34,61 @@ jobs:
 
 ### Action Inputs
 
-| Name                                     | Description                             | Default |
-| ---------------------------------------- | --------------------------------------- | ------- |
-| `changed-files`                          | List of changed files.                  |         |
-| `changed-files-separator`                | Separator to split changed files.       | "\n"    |
-| `all-packages`                           | List of all packages in the project.    | []      |
-| `all-packages-separator`                 | Separator to split all packages.        | "\n"    |
-| `changed-packages-separator`             | Separator to split changed packages.    | "\n"    |
-| `package-dependencies-resolution-method` | Method to resolve package dependencies. | "none"  |
+```yaml
+inputs:
+  changed-files:
+    description: |
+      List of changed files.
+    required: true
+  changed-files-separator:
+    description: |
+      Separator to split changed files.
+    required: true
+    default: "\n"
+  all-packages:
+    description: |
+      List of all packages in the project.
+    required: true
+  all-packages-separator:
+    description: |
+      Separator to split all packages.
+    required: true
+    default: "\n"
+  changed-packages-separator:
+    description: |
+      Separator to split changed packages.
+    required: true
+    default: "\n"
+  package-dependencies-resolution-method:
+    description: |
+      Method to resolve package dependencies. Possible values:
+        - `none` - no dependencies resolution
+        - `all` - all packages are considered changed
+        - `poetry-path` - dependencies are resolved using path dependencies from `pyproject.toml`
+    required: true
+    default: "none"
+  poetry-path-dependencies-groups:
+    description: |
+      Used only if `package-dependencies-resolution-method` is `poetry-path`.
+      Groups of dependencies to use as depencencies for poetry-path resolution method.
+    required: true
+    default: "tool.poetry.dependencies"
+  poetry-path-dependencies-groups-separator:
+    description: |
+      Used only if `package-dependencies-resolution-method` is `poetry-path`.
+      Separator to split poetry-path dependencies groups.
+    required: true
+    default: "\n"
+```
 
 ### Action Outputs
 
-| Name               | Description               |
-| ------------------ | ------------------------- |
-| `changed-packages` | List of changed packages. |
+```yaml
+outputs:
+  changed-packages:
+    description: |
+      List of changed packages.
+```
 
 ## Development
 
