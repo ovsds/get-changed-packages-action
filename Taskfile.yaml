@@ -96,7 +96,7 @@ tasks:
         {{.TEMPLATE_PATH}}
         project_name='Get Changed Packages Action'
         project_slug='get-changed-packages-action'
-        marketplace_name='Get Changed Packages'
+        marketplace_name='Get Changed Package List'
         action_type='node'
         node_version='v24.11.0'
         owner_name='Dmitry Ovsiannikov'
