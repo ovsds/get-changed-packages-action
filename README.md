@@ -29,7 +29,8 @@ jobs:
         uses: ovsds/get-changed-packages-action@v1
         with:
           changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
-          package-directory-regex: "packages/.*/"
+          all-packages: src/packages/*
+          package-dependencies-resolution-method: poetry-path
 ```
 
 ### Action Inputs
