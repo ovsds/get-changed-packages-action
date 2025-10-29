@@ -15,6 +15,7 @@ describe("Action tests", () => {
       ],
       //
       packageDirectoryRegex: new RegExp("^src/[^/]*/"),
+      packageDependenciesResolutionMethod: "none",
       logger: console.log,
     });
     expect(await action.run()).toEqual({

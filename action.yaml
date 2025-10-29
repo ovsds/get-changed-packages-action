@@ -16,6 +16,10 @@ inputs:
     description: "Separator to split changed packages."
     required: true
     default: "\n"
+  package-dependencies-resolution-method:
+    description: "Method to resolve package dependencies."
+    required: true
+    default: "none"
 
 outputs:
   changed-packages:
