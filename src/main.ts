@@ -5,11 +5,12 @@ import { ActionInput, parseActionInput } from "./input";
 
 function getActionInput(): ActionInput {
   return parseActionInput({
-    changedFiles: getInput("changed-files"),
-    changedFilesSeparator: getInput("changed-files-separator", { trimWhitespace: false }),
-    packageDirectoryRegex: getInput("package-directory-regex"),
-    changedPackagesSeparator: getInput("changed-packages-separator", { trimWhitespace: false }),
-    packageDependenciesResolutionMethod: getInput("package-dependencies-resolution-method"),
+    changedFiles: getInput("changed-files", { required: true }),
+    changedFilesSeparator: getInput("changed-files-separator", { trimWhitespace: false, required: true }),
+    allPackages: getInput("all-packages", { required: true }),
+    allPackagesSeparator: getInput("all-packages-separator", { trimWhitespace: false, required: true }),
+    changedPackagesSeparator: getInput("changed-packages-separator", { trimWhitespace: false, required: true }),
+    packageDependenciesResolutionMethod: getInput("package-dependencies-resolution-method", { required: true }),
   });
 }
 

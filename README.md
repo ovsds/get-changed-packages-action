@@ -34,13 +34,14 @@ jobs:
 
 ### Action Inputs
 
-| Name                                     | Description                                 | Default |
-| ---------------------------------------- | ------------------------------------------- | ------- |
-| `changed-files`                          | List of changed files.                      |         |
-| `changed-files-separator`                | Separator to split changed files.           | "\n"    |
-| `package-directory-regex`                | Regex pattern to match package directories. |         |
-| `changed-packages-separator`             | Separator to split changed packages.        | "\n"    |
-| `package-dependencies-resolution-method` | Method to resolve package dependencies.     | "none"  |
+| Name                                     | Description                             | Default |
+| ---------------------------------------- | --------------------------------------- | ------- |
+| `changed-files`                          | List of changed files.                  |         |
+| `changed-files-separator`                | Separator to split changed files.       | "\n"    |
+| `all-packages`                           | List of all packages in the project.    | []      |
+| `all-packages-separator`                 | Separator to split all packages.        | "\n"    |
+| `changed-packages-separator`             | Separator to split changed packages.    | "\n"    |
+| `package-dependencies-resolution-method` | Method to resolve package dependencies. | "none"  |
 
 ### Action Outputs
 

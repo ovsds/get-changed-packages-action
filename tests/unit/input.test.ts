@@ -3,9 +3,10 @@ import { describe, expect, test } from "vitest";
 import { RawActionInput, parseActionInput } from "../../src/input";
 
 const defaultRawInput = {
-  changedFiles: "test_changed_file\ntest_changed_file_2",
+  changedFiles: "package1/file.ts\npackage2/file.ts",
   changedFilesSeparator: "\n",
-  packageDirectoryRegex: ".*",
+  allPackages: "package1\npackage2",
+  allPackagesSeparator: "\n",
   changedPackagesSeparator: "\n",
   packageDependenciesResolutionMethod: "none",
 };
@@ -20,8 +21,8 @@ function createRawInput(overrides: Partial<RawActionInput> = {}): RawActionInput
 describe("Input tests", () => {
   test("parses raw input correctly", () => {
     expect(parseActionInput(createRawInput())).toEqual({
-      changedFiles: ["test_changed_file", "test_changed_file_2"],
-      packageDirectoryRegex: new RegExp(".*"),
+      changedFiles: ["package1/file.ts", "package2/file.ts"],
+      allPackages: ["package1", "package2"],
       changedPackagesSeparator: "\n",
       packageDependenciesResolutionMethod: "none",
     });
@@ -30,17 +31,13 @@ describe("Input tests", () => {
   test("empty changed files returns empty array", () => {
     expect(parseActionInput(createRawInput({ changedFiles: "" }))).toEqual({
       changedFiles: [],
-      packageDirectoryRegex: new RegExp(".*"),
+      allPackages: ["package1", "package2"],
       changedPackagesSeparator: "\n",
       packageDependenciesResolutionMethod: "none",
     });
   });
 
-  test("empty package directory regex throws error", () => {
-    expect(() => parseActionInput(createRawInput({ packageDirectoryRegex: "" }))).toThrowError();
-  });
-
-  test("empty package dependencies resolution method throws error", () => {
-    expect(() => parseActionInput(createRawInput({ packageDependenciesResolutionMethod: "" }))).toThrowError();
+  test("invalid package dependencies resolution method throws error", () => {
+    expect(() => parseActionInput(createRawInput({ packageDependenciesResolutionMethod: "invalid" }))).toThrowError();
   });
 });
