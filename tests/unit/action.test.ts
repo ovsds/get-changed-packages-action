@@ -6,20 +6,23 @@ import { Action, ActionOptions } from "../../src/action";
 import { PackageDependenciesResolutionMethodLiteral } from "../../src/models";
 
 const projectRootPath = path.resolve(__dirname, "../..");
+const defaultDataPath = path.join(projectRootPath, "tests/data/default");
 const poetryPathDefaultDataPath = path.join(projectRootPath, "tests/data/poetry-path/default");
 const poetryPathNonDefaultGroupDataPath = path.join(projectRootPath, "tests/data/poetry-path/non-default-group");
 const poetryPathCircularDataPath = path.join(projectRootPath, "tests/data/poetry-path/circular");
 
 const defaultActionOptions = {
   changedFiles: [
-    path.join(projectRootPath, "src/package1/file.ts"),
-    path.join(projectRootPath, "src/package1/file2.ts"),
-    path.join(projectRootPath, "src/package1/subfolder/file.ts"),
-    path.join(projectRootPath, "src/package2/file.ts"),
-    path.join(projectRootPath, "other/file.ts"),
-    path.join(projectRootPath, "other/src/package4/file.ts"),
+    path.join(defaultDataPath, "src/package1/file.ts"),
+    path.join(defaultDataPath, "src/package2/subfolder/file.ts"),
+    path.join(defaultDataPath, "other/package4/file.ts"),
+    path.join(defaultDataPath, "other/package5/file.ts"),
   ],
-  allPackages: [path.join(projectRootPath, "src/package1"), path.join(projectRootPath, "src/package2")],
+  allPackages: [
+    path.join(defaultDataPath, "src/package1"),
+    path.join(defaultDataPath, "src/package2"),
+    path.join(defaultDataPath, "src/package3"),
+  ],
   packageDependenciesResolutionMethod: "none" as PackageDependenciesResolutionMethodLiteral,
   poetryPathDependenciesGroups: ["tool.poetry.dependencies"],
   logger: console.log,
@@ -36,7 +39,18 @@ describe("Action tests", () => {
   test("runs with default options", async () => {
     const action = Action.fromOptions(createActionOptions());
     expect(await action.run()).toEqual({
-      changedPackages: [path.join(projectRootPath, "src/package1"), path.join(projectRootPath, "src/package2")],
+      changedPackages: [path.join(defaultDataPath, "src/package1"), path.join(defaultDataPath, "src/package2")],
+    });
+  });
+
+  test("runs with glob for allPackages", async () => {
+    const action = Action.fromOptions(
+      createActionOptions({
+        allPackages: [path.join(defaultDataPath, "src/*")],
+      }),
+    );
+    expect(await action.run()).toEqual({
+      changedPackages: [path.join(defaultDataPath, "src/package1"), path.join(defaultDataPath, "src/package2")],
     });
   });
 
@@ -47,7 +61,11 @@ describe("Action tests", () => {
       }),
     );
     expect(await action.run()).toEqual({
-      changedPackages: [path.join(projectRootPath, "src/package1"), path.join(projectRootPath, "src/package2")],
+      changedPackages: [
+        path.join(defaultDataPath, "src/package1"),
+        path.join(defaultDataPath, "src/package2"),
+        path.join(defaultDataPath, "src/package3"),
+      ],
     });
   });
 
