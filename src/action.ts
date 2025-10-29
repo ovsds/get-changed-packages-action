@@ -1,4 +1,5 @@
 import fs from "fs";
+import { glob } from "node:fs/promises";
 import path from "path";
 import toml from "toml";
 
@@ -31,10 +32,18 @@ export class Action {
     };
   }
 
-  private getChangedPackages(): string[] {
+  private async getAllPackages(): Promise<string[]> {
+    const result = new Set<string>();
+    for await (const packagePath of glob(this.options.allPackages)) {
+      result.add(packagePath);
+    }
+    return Array.from(result);
+  }
+
+  private getChangedPackages(allPackages: string[]): string[] {
     const result = [];
 
-    for (const packagePath of this.options.allPackages) {
+    for (const packagePath of allPackages) {
       for (const file of this.options.changedFiles) {
         if (file.startsWith(packagePath)) {
           result.push(packagePath);
@@ -82,10 +91,10 @@ export class Action {
     return result;
   }
 
-  private getPoetryPathDependenciesMapping(): Map<string, Set<string>> {
+  private getPoetryPathDependenciesMapping(allPackages: string[]): Map<string, Set<string>> {
     const dependencies = new Map<string, Set<string>>();
 
-    for (const packagePath of this.options.allPackages) {
+    for (const packagePath of allPackages) {
       const packageDependencies = this.getPoetryPathPackageDependencies(packagePath);
       for (const dependencyPath of packageDependencies) {
         if (dependencies.has(dependencyPath)) {
@@ -108,8 +117,8 @@ export class Action {
     return dependencies;
   }
 
-  private getChangedPackagesWithDependenciesForPoetryPath(changedPackages: string[]): string[] {
-    const dependencies = this.getPoetryPathDependenciesMapping();
+  private getChangedPackagesWithDependenciesForPoetryPath(changedPackages: string[], allPackages: string[]): string[] {
+    const dependencies = this.getPoetryPathDependenciesMapping(allPackages);
 
     const result = new Set<string>();
     const visitedPackages = new Set<string>();
@@ -134,14 +143,14 @@ export class Action {
     return Array.from(result);
   }
 
-  private getChangedPackagesWithDependencies(changedPackages: string[]): string[] {
+  private getChangedPackagesWithDependencies(changedPackages: string[], allPackages: string[]): string[] {
     switch (this.options.packageDependenciesResolutionMethod) {
       case "none":
         return changedPackages;
       case "all":
-        return this.options.allPackages;
+        return allPackages;
       case "poetry-path":
-        return this.getChangedPackagesWithDependenciesForPoetryPath(changedPackages);
+        return this.getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages);
       default:
         throw new Error(
           `Unsupported package dependencies resolution method: ${this.options.packageDependenciesResolutionMethod}`,
@@ -150,13 +159,14 @@ export class Action {
   }
 
   async run(): Promise<ActionResult> {
-    const changedPackages = this.getChangedPackages();
+    const allPackages = await this.getAllPackages();
+    const changedPackages = this.getChangedPackages(allPackages);
 
     this.options.logger(`Found ${changedPackages.length} changed packages:`);
     this.options.logger(changedPackages.join("\n"));
     this.options.logger("");
 
-    const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages);
+    const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages, allPackages);
 
     this.options.logger(`Found ${changedPackagesWithDependencies.length} changed packages with dependencies:`);
     this.options.logger(changedPackagesWithDependencies.join("\n"));

@@ -15,12 +15,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Action = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(9896));
+const promises_1 = __nccwpck_require__(1455);
 const path_1 = __importDefault(__nccwpck_require__(6928));
 const toml_1 = __importDefault(__nccwpck_require__(2132));
 class Action {
@@ -30,9 +38,31 @@ class Action {
     constructor(actionOptions) {
         this.options = Object.assign(Object.assign({}, actionOptions), { allPackages: actionOptions.allPackages.map((packagePath) => path_1.default.resolve(packagePath)), changedFiles: actionOptions.changedFiles.map((filePath) => path_1.default.resolve(filePath)) });
     }
-    getChangedPackages() {
+    getAllPackages() {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, e_1, _b, _c;
+            const result = new Set();
+            try {
+                for (var _d = true, _e = __asyncValues((0, promises_1.glob)(this.options.allPackages)), _f; _f = yield _e.next(), _a = _f.done, !_a; _d = true) {
+                    _c = _f.value;
+                    _d = false;
+                    const packagePath = _c;
+                    result.add(packagePath);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return Array.from(result);
+        });
+    }
+    getChangedPackages(allPackages) {
         const result = [];
-        for (const packagePath of this.options.allPackages) {
+        for (const packagePath of allPackages) {
             for (const file of this.options.changedFiles) {
                 if (file.startsWith(packagePath)) {
                     result.push(packagePath);
@@ -73,9 +103,9 @@ class Action {
         }
         return result;
     }
-    getPoetryPathDependenciesMapping() {
+    getPoetryPathDependenciesMapping(allPackages) {
         const dependencies = new Map();
-        for (const packagePath of this.options.allPackages) {
+        for (const packagePath of allPackages) {
             const packageDependencies = this.getPoetryPathPackageDependencies(packagePath);
             for (const dependencyPath of packageDependencies) {
                 if (dependencies.has(dependencyPath)) {
@@ -96,8 +126,8 @@ class Action {
         this.options.logger("");
         return dependencies;
     }
-    getChangedPackagesWithDependenciesForPoetryPath(changedPackages) {
-        const dependencies = this.getPoetryPathDependenciesMapping();
+    getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages) {
+        const dependencies = this.getPoetryPathDependenciesMapping(allPackages);
         const result = new Set();
         const visitedPackages = new Set();
         const queue = [...changedPackages];
@@ -118,25 +148,26 @@ class Action {
         }
         return Array.from(result);
     }
-    getChangedPackagesWithDependencies(changedPackages) {
+    getChangedPackagesWithDependencies(changedPackages, allPackages) {
         switch (this.options.packageDependenciesResolutionMethod) {
             case "none":
                 return changedPackages;
             case "all":
-                return this.options.allPackages;
+                return allPackages;
             case "poetry-path":
-                return this.getChangedPackagesWithDependenciesForPoetryPath(changedPackages);
+                return this.getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages);
             default:
                 throw new Error(`Unsupported package dependencies resolution method: ${this.options.packageDependenciesResolutionMethod}`);
         }
     }
     run() {
         return __awaiter(this, void 0, void 0, function* () {
-            const changedPackages = this.getChangedPackages();
+            const allPackages = yield this.getAllPackages();
+            const changedPackages = this.getChangedPackages(allPackages);
             this.options.logger(`Found ${changedPackages.length} changed packages:`);
             this.options.logger(changedPackages.join("\n"));
             this.options.logger("");
-            const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages);
+            const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages, allPackages);
             this.options.logger(`Found ${changedPackagesWithDependencies.length} changed packages with dependencies:`);
             this.options.logger(changedPackagesWithDependencies.join("\n"));
             this.options.logger("");
@@ -30125,6 +30156,14 @@ module.exports = require("node:crypto");
 
 "use strict";
 module.exports = require("node:events");
+
+/***/ }),
+
+/***/ 1455:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs/promises");
 
 /***/ }),
 
