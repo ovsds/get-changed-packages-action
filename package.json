@@ -37,7 +37,7 @@
     "lint:fix": "npm run lint:fix:prettier && npm run lint:fix:eslint",
     "lint:fix:eslint": "eslint . --fix",
     "lint:fix:prettier": "prettier --write .",
-    "test": "vitest",
+    "test": "vitest --printConsoleTrace=true",
     "test:unit": "vitest tests/unit",
     "test:integration": "vitest tests/integration",
     "build": "tsc",

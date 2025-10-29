@@ -4,24 +4,26 @@ import { parsePackageDependenciesResolutionMethod, PackageDependenciesResolution
 export interface RawActionInput {
   changedFiles: string;
   changedFilesSeparator: string;
-  packageDirectoryRegex: string;
+  allPackages: string;
+  allPackagesSeparator: string;
   changedPackagesSeparator: string;
   packageDependenciesResolutionMethod: string;
 }
 
 export interface ActionInput {
   changedFiles: string[];
-  packageDirectoryRegex: RegExp;
+  allPackages: string[];
   changedPackagesSeparator: string;
   packageDependenciesResolutionMethod: PackageDependenciesResolutionMethodLiteral;
 }
 
 export function parseActionInput(raw: RawActionInput): ActionInput {
   const changedFilesSeparator = parseNonEmptyString(raw.changedFilesSeparator);
+  const allPackagesSeparator = parseNonEmptyString(raw.allPackagesSeparator);
 
   return {
     changedFiles: parseListOfStrings(raw.changedFiles, changedFilesSeparator),
-    packageDirectoryRegex: parseRegex(raw.packageDirectoryRegex),
+    allPackages: parseListOfStrings(raw.allPackages, allPackagesSeparator),
     changedPackagesSeparator: parseNonEmptyString(raw.changedPackagesSeparator),
     packageDependenciesResolutionMethod: parsePackageDependenciesResolutionMethod(
       raw.packageDependenciesResolutionMethod,

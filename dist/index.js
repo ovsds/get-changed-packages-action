@@ -24,28 +24,34 @@ class Action {
     constructor(actionOptions) {
         this.options = actionOptions;
     }
-    getChangedPackages(changedFiles, packageDirectoryRegex) {
-        return Array.from(new Set(changedFiles
-            .map((file) => {
-            const match = file.match(packageDirectoryRegex);
-            return match ? match[0] : null;
-        })
-            .filter((directory) => directory !== null)));
+    getChangedPackages() {
+        const result = [];
+        for (const packagePath of this.options.allPackages) {
+            for (const file of this.options.changedFiles) {
+                if (file.startsWith(packagePath)) {
+                    result.push(packagePath);
+                    break;
+                }
+            }
+        }
+        return result;
     }
-    getChangedPackagesWithDependencies(changedPackages, packageDependenciesResolutionMethod) {
-        switch (packageDependenciesResolutionMethod) {
+    getChangedPackagesWithDependencies(changedPackages) {
+        switch (this.options.packageDependenciesResolutionMethod) {
             case "none":
                 return changedPackages;
+            case "all":
+                return this.options.allPackages;
             default:
-                throw new Error(`Unsupported package dependencies resolution method: ${packageDependenciesResolutionMethod}`);
+                throw new Error(`Unsupported package dependencies resolution method: ${this.options.packageDependenciesResolutionMethod}`);
         }
     }
     run() {
         return __awaiter(this, void 0, void 0, function* () {
-            const changedPackages = this.getChangedPackages(this.options.changedFiles, this.options.packageDirectoryRegex);
+            const changedPackages = this.getChangedPackages();
             this.options.logger(`Found ${changedPackages.length} changed packages:`);
             this.options.logger(changedPackages.join("\n"));
-            const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages, this.options.packageDependenciesResolutionMethod);
+            const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages);
             return {
                 changedPackages: changedPackagesWithDependencies,
             };
@@ -68,9 +74,10 @@ const parse_1 = __nccwpck_require__(789);
 const models_1 = __nccwpck_require__(6324);
 function parseActionInput(raw) {
     const changedFilesSeparator = (0, parse_1.parseNonEmptyString)(raw.changedFilesSeparator);
+    const allPackagesSeparator = (0, parse_1.parseNonEmptyString)(raw.allPackagesSeparator);
     return {
         changedFiles: (0, parse_1.parseListOfStrings)(raw.changedFiles, changedFilesSeparator),
-        packageDirectoryRegex: (0, parse_1.parseRegex)(raw.packageDirectoryRegex),
+        allPackages: (0, parse_1.parseListOfStrings)(raw.allPackages, allPackagesSeparator),
         changedPackagesSeparator: (0, parse_1.parseNonEmptyString)(raw.changedPackagesSeparator),
         packageDependenciesResolutionMethod: (0, models_1.parsePackageDependenciesResolutionMethod)(raw.packageDependenciesResolutionMethod),
     };
@@ -99,11 +106,12 @@ const action_1 = __nccwpck_require__(1536);
 const input_1 = __nccwpck_require__(2868);
 function getActionInput() {
     return (0, input_1.parseActionInput)({
-        changedFiles: (0, core_1.getInput)("changed-files"),
-        changedFilesSeparator: (0, core_1.getInput)("changed-files-separator", { trimWhitespace: false }),
-        packageDirectoryRegex: (0, core_1.getInput)("package-directory-regex"),
-        changedPackagesSeparator: (0, core_1.getInput)("changed-packages-separator", { trimWhitespace: false }),
-        packageDependenciesResolutionMethod: (0, core_1.getInput)("package-dependencies-resolution-method"),
+        changedFiles: (0, core_1.getInput)("changed-files", { required: true }),
+        changedFilesSeparator: (0, core_1.getInput)("changed-files-separator", { trimWhitespace: false, required: true }),
+        allPackages: (0, core_1.getInput)("all-packages", { required: true }),
+        allPackagesSeparator: (0, core_1.getInput)("all-packages-separator", { trimWhitespace: false, required: true }),
+        changedPackagesSeparator: (0, core_1.getInput)("changed-packages-separator", { trimWhitespace: false, required: true }),
+        packageDependenciesResolutionMethod: (0, core_1.getInput)("package-dependencies-resolution-method", { required: true }),
     });
 }
 function setActionOutput(actionResult, changedPackagesSeparator) {
@@ -146,7 +154,7 @@ main();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parsePackageDependenciesResolutionMethod = exports.packageDependenciesResolutionMethods = void 0;
 const parse_1 = __nccwpck_require__(789);
-exports.packageDependenciesResolutionMethods = ["none"];
+exports.packageDependenciesResolutionMethods = ["none", "all"];
 const parsePackageDependenciesResolutionMethod = (value) => {
     value = (0, parse_1.parseNonEmptyString)(value);
     if (!exports.packageDependenciesResolutionMethods.includes(value)) {

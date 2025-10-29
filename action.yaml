@@ -9,9 +9,13 @@ inputs:
     description: "Separator to split changed files."
     required: true
     default: "\n"
-  package-directory-regex:
-    description: "Regex pattern to match package directories."
+  all-packages:
+    description: "List of all packages in the project."
     required: true
+  all-packages-separator:
+    description: "Separator to split all packages."
+    required: true
+    default: "\n"
   changed-packages-separator:
     description: "Separator to split changed packages."
     required: true

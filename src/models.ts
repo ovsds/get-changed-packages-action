@@ -1,6 +1,6 @@
 import { parseNonEmptyString } from "./utils/parse";
 
-export const packageDependenciesResolutionMethods = ["none"] as const;
+export const packageDependenciesResolutionMethods = ["none", "all"] as const;
 export type PackageDependenciesResolutionMethodLiteral = (typeof packageDependenciesResolutionMethods)[number];
 export const parsePackageDependenciesResolutionMethod = (
   value: string | undefined,

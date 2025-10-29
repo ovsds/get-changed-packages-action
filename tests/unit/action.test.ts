@@ -13,13 +13,24 @@ describe("Action tests", () => {
         "other/file.ts",
         "other/src/package4/file.ts",
       ],
-      //
-      packageDirectoryRegex: new RegExp("^src/[^/]*/"),
+      allPackages: ["src/package1", "src/package2"],
       packageDependenciesResolutionMethod: "none",
       logger: console.log,
     });
     expect(await action.run()).toEqual({
-      changedPackages: ["src/package1/", "src/package2/"],
+      changedPackages: ["src/package1", "src/package2"],
+    });
+  });
+
+  test("runs with changed files and package dependencies resolution method all", async () => {
+    const action = Action.fromOptions({
+      changedFiles: ["src/package1/file.ts"],
+      allPackages: ["src/package1", "src/package2"],
+      packageDependenciesResolutionMethod: "all",
+      logger: console.log,
+    });
+    expect(await action.run()).toEqual({
+      changedPackages: ["src/package1", "src/package2"],
     });
   });
 });
