@@ -148,4 +148,14 @@ describe("Action tests", () => {
       changedPackages: [path.join(dataPath, "package1"), path.join(dataPath, "package2")],
     });
   });
+
+  test("runs with method: poetry-path and no changed packages", async () => {
+    const action = Action.fromOptions(
+      createActionOptions({
+        changedFiles: [],
+        allPackages: [path.join(poetryPathDefaultDataPath, "parent")],
+        packageDependenciesResolutionMethod: "poetry-path",
+      }),
+    );
+  });
 });
