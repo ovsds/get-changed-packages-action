@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { parseNonEmptyString, parseListOfStrings, parseRegex } from "../../../src/utils/parse";
+import { parseNonEmptyString, parseListOfStrings, parseRegex, parseBoolean } from "../../../src/utils/parse";
 
 describe("Parse utils tests", () => {
   test("parseNonEmptyString parses non-empty string correctly", () => {
@@ -42,5 +42,16 @@ describe("parseRegex tests", () => {
 
   test("parseRegex throws error when empty string", () => {
     expect(() => parseRegex("")).toThrowError();
+  });
+});
+
+describe("parseBoolean tests", () => {
+  test("parseBoolean parses boolean correctly", () => {
+    expect(parseBoolean("true")).toBe(true);
+    expect(parseBoolean("false")).toBe(false);
+  });
+
+  test("parseBoolean throws error when invalid boolean", () => {
+    expect(() => parseBoolean("test")).toThrowError();
   });
 });

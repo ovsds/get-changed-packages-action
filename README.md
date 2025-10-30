@@ -62,6 +62,12 @@ inputs:
         - `json` - JSON object with changed packages
     required: true
     default: "list"
+  changed-packages-relative-path:
+    description: |
+      If `true`, path are returned relative to the working directory.
+      If `false`, absolute paths are returned.
+    required: true
+    default: "false"
   changed-packages-list-separator:
     description: |
       Used only if `changed-packages-format` is `list`.

@@ -1,4 +1,4 @@
-import { getInput, info, setFailed, setOutput } from "@actions/core";
+import { getInput, info, warning, setFailed, setOutput, startGroup, endGroup } from "@actions/core";
 
 import { Action, ActionResult } from "./action";
 import { ActionInput, parseActionInput } from "./input";
@@ -11,6 +11,7 @@ function getActionInput(): ActionInput {
     allPackages: getInput("all-packages", { required: true }),
     allPackagesSeparator: getInput("all-packages-separator", { trimWhitespace: false, required: true }),
     changedPackagesFormat: getInput("changed-packages-format", { required: true }),
+    changedPackagesRelativePath: getInput("changed-packages-relative-path", { required: true }),
     changedPackagesListSeparator: getInput("changed-packages-list-separator", {
       trimWhitespace: false,
       required: true,
@@ -41,7 +42,13 @@ async function _main(): Promise<void> {
   const actionInput = getActionInput();
   const actionInstance = Action.fromOptions({
     ...actionInput,
-    logger: info,
+    rootPath: process.cwd(),
+    logger: {
+      info: info,
+      warning: warning,
+      startGroup: startGroup,
+      endGroup: endGroup,
+    },
   });
   const actionResult = await actionInstance.run();
   setActionOutput(actionResult, actionInput.changedPackagesFormat, actionInput.changedPackagesListSeparator);

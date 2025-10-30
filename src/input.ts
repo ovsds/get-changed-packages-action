@@ -1,4 +1,4 @@
-import { parseListOfStrings, parseNonEmptyString } from "./utils/parse";
+import { parseListOfStrings, parseNonEmptyString, parseBoolean } from "./utils/parse";
 import {
   parsePackageDependenciesResolutionMethod,
   PackageDependenciesResolutionMethodLiteral,
@@ -12,6 +12,7 @@ export interface RawActionInput {
   allPackages: string;
   allPackagesSeparator: string;
   changedPackagesFormat: string;
+  changedPackagesRelativePath: string;
   changedPackagesListSeparator: string;
   packageDependenciesResolutionMethod: string;
   poetryPathDependenciesGroups: string;
@@ -22,6 +23,7 @@ export interface ActionInput {
   changedFiles: string[];
   allPackages: string[];
   changedPackagesFormat: ChangedPackagesFormatLiteral;
+  changedPackagesRelativePath: boolean;
   changedPackagesListSeparator: string;
   packageDependenciesResolutionMethod: PackageDependenciesResolutionMethodLiteral;
   poetryPathDependenciesGroups: string[];
@@ -36,6 +38,7 @@ export function parseActionInput(raw: RawActionInput): ActionInput {
     changedFiles: parseListOfStrings(raw.changedFiles, changedFilesSeparator),
     allPackages: parseListOfStrings(raw.allPackages, allPackagesSeparator),
     changedPackagesFormat: parseChangedPackagesFormat(raw.changedPackagesFormat),
+    changedPackagesRelativePath: parseBoolean(raw.changedPackagesRelativePath),
     changedPackagesListSeparator: parseNonEmptyString(raw.changedPackagesListSeparator),
     packageDependenciesResolutionMethod: parsePackageDependenciesResolutionMethod(
       raw.packageDependenciesResolutionMethod,

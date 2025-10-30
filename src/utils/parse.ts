@@ -22,3 +22,13 @@ export const parseRegex = (value: string | undefined): RegExp => {
     throw new Error(`Invalid ${value}, must be a valid regex`);
   }
 };
+
+export const parseBoolean = (value: string | undefined): boolean => {
+  if (value === "true") {
+    return true;
+  }
+  if (value === "false") {
+    return false;
+  }
+  throw new Error(`Invalid ${value}, must be "true" or "false"`);
+};

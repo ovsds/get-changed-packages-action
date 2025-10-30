@@ -9,12 +9,21 @@ export interface ActionResult {
   changedPackages: string[];
 }
 
+export interface ActionLogger {
+  info(message: string): void;
+  warning(message: string): void;
+  startGroup(name: string): void;
+  endGroup(): void;
+}
+
 export interface ActionOptions {
   changedFiles: string[];
   allPackages: string[];
+  changedPackagesRelativePath: boolean;
   packageDependenciesResolutionMethod: PackageDependenciesResolutionMethodLiteral;
   poetryPathDependenciesGroups: string[];
-  logger: (message: string) => void;
+  rootPath: string;
+  logger: ActionLogger;
 }
 
 export class Action {
@@ -58,7 +67,7 @@ export class Action {
     const pyprojectTomlPath = path.join(packagePath, "pyproject.toml");
 
     if (!fs.existsSync(pyprojectTomlPath)) {
-      this.options.logger(`WARNING: ${pyprojectTomlPath} not found, assuming no dependencies...`);
+      this.options.logger.warning(`${pyprojectTomlPath} not found, assuming no dependencies...`);
       return new Set<string>();
     }
 
@@ -109,6 +118,15 @@ export class Action {
     return dependencies;
   }
 
+  private getRelativePath(absolutePath: string): string {
+    return path.relative(this.options.rootPath, absolutePath);
+  }
+
+  private formatPackagePath(absolutePackagePath: string): string {
+    const relativePackagePath = this.getRelativePath(absolutePackagePath);
+    return `${relativePackagePath} (${absolutePackagePath})`;
+  }
+
   private getChangedPackagesWithDependenciesForPoetryPath(changedPackages: string[], allPackages: string[]): string[] {
     if (changedPackages.length === 0) {
       return [];
@@ -116,14 +134,14 @@ export class Action {
 
     const dependencies = this.getPoetryPathDependenciesMapping(allPackages);
 
-    this.options.logger(`Poetry path dependencies:`);
+    this.options.logger.startGroup(`Poetry path dependencies`);
     for (const [dependencyPath, packagePaths] of dependencies.entries()) {
-      this.options.logger(`${dependencyPath}:`);
+      this.options.logger.info(`${this.formatPackagePath(dependencyPath)}:`);
       for (const packagePath of packagePaths) {
-        this.options.logger(`  ${packagePath}`);
+        this.options.logger.info(`  ${this.formatPackagePath(packagePath)}`);
       }
     }
-    this.options.logger("");
+    this.options.logger.endGroup();
 
     const result = new Set<string>();
     const visitedPackages = new Set<string>();
@@ -165,24 +183,28 @@ export class Action {
 
   async run(): Promise<ActionResult> {
     const allPackages = await this.getAllPackages();
-    this.options.logger(`All packages:`);
-    this.options.logger(allPackages.join("\n"));
-    this.options.logger("");
+    this.options.logger.startGroup(`All packages (${allPackages.length})`);
+    this.options.logger.info(allPackages.map((packagePath) => this.formatPackagePath(packagePath)).join("\n"));
+    this.options.logger.endGroup();
 
     const changedPackages = this.getChangedPackages(allPackages);
 
-    this.options.logger(`Changed packages:`);
-    this.options.logger(changedPackages.join("\n"));
-    this.options.logger("");
+    this.options.logger.startGroup(`Changed packages (${changedPackages.length})`);
+    this.options.logger.info(changedPackages.map((packagePath) => this.formatPackagePath(packagePath)).join("\n"));
+    this.options.logger.endGroup();
 
     const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages, allPackages);
 
-    this.options.logger(`Changed packages with dependencies:`);
-    this.options.logger(changedPackagesWithDependencies.join("\n"));
-    this.options.logger("");
+    this.options.logger.startGroup(`Changed packages with dependencies (${changedPackagesWithDependencies.length})`);
+    this.options.logger.info(
+      changedPackagesWithDependencies.map((packagePath) => this.formatPackagePath(packagePath)).join("\n"),
+    );
+    this.options.logger.endGroup();
 
     return {
-      changedPackages: changedPackagesWithDependencies,
+      changedPackages: this.options.changedPackagesRelativePath
+        ? changedPackagesWithDependencies.map((packagePath) => this.getRelativePath(packagePath))
+        : changedPackagesWithDependencies,
     };
   }
 }

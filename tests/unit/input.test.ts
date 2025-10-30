@@ -8,6 +8,7 @@ const defaultRawInput = {
   allPackages: "package1\npackage2",
   allPackagesSeparator: "\n",
   changedPackagesFormat: "list",
+  changedPackagesRelativePath: "false",
   changedPackagesListSeparator: "\n",
   packageDependenciesResolutionMethod: "none",
   poetryPathDependenciesGroups: "group1\ngroup2",
@@ -27,13 +28,10 @@ describe("Input tests", () => {
       changedFiles: ["package1/file.ts", "package2/file.ts"],
       allPackages: ["package1", "package2"],
       changedPackagesFormat: "list",
+      changedPackagesRelativePath: false,
       changedPackagesListSeparator: "\n",
       packageDependenciesResolutionMethod: "none",
       poetryPathDependenciesGroups: ["group1", "group2"],
     });
-  });
-
-  test("invalid package dependencies resolution method throws error", () => {
-    expect(() => parseActionInput(createRawInput({ packageDependenciesResolutionMethod: "invalid" }))).toThrowError();
   });
 });

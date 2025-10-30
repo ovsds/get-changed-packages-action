@@ -75,7 +75,7 @@ class Action {
     getPoetryPathPackageDependencies(packagePath) {
         const pyprojectTomlPath = path_1.default.join(packagePath, "pyproject.toml");
         if (!fs_1.default.existsSync(pyprojectTomlPath)) {
-            this.options.logger(`WARNING: ${pyprojectTomlPath} not found, assuming no dependencies...`);
+            this.options.logger.warning(`${pyprojectTomlPath} not found, assuming no dependencies...`);
             return new Set();
         }
         const pyprojectToml = fs_1.default.readFileSync(pyprojectTomlPath, "utf-8");
@@ -119,19 +119,26 @@ class Action {
         }
         return dependencies;
     }
+    getRelativePath(absolutePath) {
+        return path_1.default.relative(this.options.rootPath, absolutePath);
+    }
+    formatPackagePath(absolutePackagePath) {
+        const relativePackagePath = this.getRelativePath(absolutePackagePath);
+        return `${relativePackagePath} (${absolutePackagePath})`;
+    }
     getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages) {
         if (changedPackages.length === 0) {
             return [];
         }
         const dependencies = this.getPoetryPathDependenciesMapping(allPackages);
-        this.options.logger(`Poetry path dependencies:`);
+        this.options.logger.startGroup(`Poetry path dependencies`);
         for (const [dependencyPath, packagePaths] of dependencies.entries()) {
-            this.options.logger(`${dependencyPath}:`);
+            this.options.logger.info(`${this.formatPackagePath(dependencyPath)}:`);
             for (const packagePath of packagePaths) {
-                this.options.logger(`  ${packagePath}`);
+                this.options.logger.info(`  ${this.formatPackagePath(packagePath)}`);
             }
         }
-        this.options.logger("");
+        this.options.logger.endGroup();
         const result = new Set();
         const visitedPackages = new Set();
         const queue = [...changedPackages];
@@ -167,19 +174,21 @@ class Action {
     run() {
         return __awaiter(this, void 0, void 0, function* () {
             const allPackages = yield this.getAllPackages();
-            this.options.logger(`All packages:`);
-            this.options.logger(allPackages.join("\n"));
-            this.options.logger("");
+            this.options.logger.startGroup(`All packages (${allPackages.length})`);
+            this.options.logger.info(allPackages.map((packagePath) => this.formatPackagePath(packagePath)).join("\n"));
+            this.options.logger.endGroup();
             const changedPackages = this.getChangedPackages(allPackages);
-            this.options.logger(`Changed packages:`);
-            this.options.logger(changedPackages.join("\n"));
-            this.options.logger("");
+            this.options.logger.startGroup(`Changed packages (${changedPackages.length})`);
+            this.options.logger.info(changedPackages.map((packagePath) => this.formatPackagePath(packagePath)).join("\n"));
+            this.options.logger.endGroup();
             const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages, allPackages);
-            this.options.logger(`Changed packages with dependencies:`);
-            this.options.logger(changedPackagesWithDependencies.join("\n"));
-            this.options.logger("");
+            this.options.logger.startGroup(`Changed packages with dependencies (${changedPackagesWithDependencies.length})`);
+            this.options.logger.info(changedPackagesWithDependencies.map((packagePath) => this.formatPackagePath(packagePath)).join("\n"));
+            this.options.logger.endGroup();
             return {
-                changedPackages: changedPackagesWithDependencies,
+                changedPackages: this.options.changedPackagesRelativePath
+                    ? changedPackagesWithDependencies.map((packagePath) => this.getRelativePath(packagePath))
+                    : changedPackagesWithDependencies,
             };
         });
     }
@@ -206,6 +215,7 @@ function parseActionInput(raw) {
         changedFiles: (0, parse_1.parseListOfStrings)(raw.changedFiles, changedFilesSeparator),
         allPackages: (0, parse_1.parseListOfStrings)(raw.allPackages, allPackagesSeparator),
         changedPackagesFormat: (0, models_1.parseChangedPackagesFormat)(raw.changedPackagesFormat),
+        changedPackagesRelativePath: (0, parse_1.parseBoolean)(raw.changedPackagesRelativePath),
         changedPackagesListSeparator: (0, parse_1.parseNonEmptyString)(raw.changedPackagesListSeparator),
         packageDependenciesResolutionMethod: (0, models_1.parsePackageDependenciesResolutionMethod)(raw.packageDependenciesResolutionMethod),
         poetryPathDependenciesGroups: (0, parse_1.parseListOfStrings)(raw.poetryPathDependenciesGroups, poetryPathDependenciesGroupsSeparator),
@@ -240,6 +250,7 @@ function getActionInput() {
         allPackages: (0, core_1.getInput)("all-packages", { required: true }),
         allPackagesSeparator: (0, core_1.getInput)("all-packages-separator", { trimWhitespace: false, required: true }),
         changedPackagesFormat: (0, core_1.getInput)("changed-packages-format", { required: true }),
+        changedPackagesRelativePath: (0, core_1.getInput)("changed-packages-relative-path", { required: true }),
         changedPackagesListSeparator: (0, core_1.getInput)("changed-packages-list-separator", {
             trimWhitespace: false,
             required: true,
@@ -264,7 +275,12 @@ function setActionOutput(actionResult, changedPackagesFormat, changedPackagesLis
 function _main() {
     return __awaiter(this, void 0, void 0, function* () {
         const actionInput = getActionInput();
-        const actionInstance = action_1.Action.fromOptions(Object.assign(Object.assign({}, actionInput), { logger: core_1.info }));
+        const actionInstance = action_1.Action.fromOptions(Object.assign(Object.assign({}, actionInput), { rootPath: process.cwd(), logger: {
+                info: core_1.info,
+                warning: core_1.warning,
+                startGroup: core_1.startGroup,
+                endGroup: core_1.endGroup,
+            } }));
         const actionResult = yield actionInstance.run();
         setActionOutput(actionResult, actionInput.changedPackagesFormat, actionInput.changedPackagesListSeparator);
     });
@@ -325,7 +341,7 @@ exports.parseChangedPackagesFormat = parseChangedPackagesFormat;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseRegex = exports.parseListOfStrings = exports.parseNonEmptyString = void 0;
+exports.parseBoolean = exports.parseRegex = exports.parseListOfStrings = exports.parseNonEmptyString = void 0;
 const parseNonEmptyString = (value) => {
     if (value === undefined || value === "") {
         throw new Error(`Invalid ${value}, must be a non-empty string`);
@@ -352,6 +368,16 @@ const parseRegex = (value) => {
     }
 };
 exports.parseRegex = parseRegex;
+const parseBoolean = (value) => {
+    if (value === "true") {
+        return true;
+    }
+    if (value === "false") {
+        return false;
+    }
+    throw new Error(`Invalid ${value}, must be "true" or "false"`);
+};
+exports.parseBoolean = parseBoolean;
 
 
 /***/ }),

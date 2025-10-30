@@ -23,9 +23,16 @@ const defaultActionOptions = {
     path.join(defaultDataPath, "src/package2"),
     path.join(defaultDataPath, "src/package3"),
   ],
+  changedPackagesRelativePath: false,
   packageDependenciesResolutionMethod: "none" as PackageDependenciesResolutionMethodLiteral,
   poetryPathDependenciesGroups: ["tool.poetry.dependencies"],
-  logger: console.log,
+  rootPath: defaultDataPath,
+  logger: {
+    info: console.log,
+    warning: (message: string) => console.log(`[WARNING] ${message}`),
+    startGroup: (message: string) => console.log(`[START GROUP] ${message}`),
+    endGroup: () => console.log(`[END GROUP]`),
+  },
 };
 
 function createActionOptions(overrides: Partial<ActionOptions> = {}): ActionOptions {
@@ -51,6 +58,41 @@ describe("Action tests", () => {
     );
     expect(await action.run()).toEqual({
       changedPackages: [path.join(defaultDataPath, "src/package1"), path.join(defaultDataPath, "src/package2")],
+    });
+  });
+
+  test("runs with relative paths", async () => {
+    const absoluteDataPath = defaultDataPath;
+    const relativeDataPath = path.relative(projectRootPath, absoluteDataPath);
+
+    const action = Action.fromOptions(
+      createActionOptions({
+        changedFiles: [
+          path.join(relativeDataPath, "src/package1/file.ts"),
+          path.join(relativeDataPath, "src/package2/subfolder/file.ts"),
+          path.join(relativeDataPath, "other/package4/file.ts"),
+          path.join(relativeDataPath, "other/package5/file.ts"),
+        ],
+        allPackages: [
+          path.join(relativeDataPath, "src/package1"),
+          path.join(relativeDataPath, "src/package2"),
+          path.join(relativeDataPath, "src/package3"),
+        ],
+      }),
+    );
+    expect(await action.run()).toEqual({
+      changedPackages: [path.join(absoluteDataPath, "src/package1"), path.join(absoluteDataPath, "src/package2")],
+    });
+  });
+
+  test("runs with changedPackagesRelativePath: true", async () => {
+    const action = Action.fromOptions(
+      createActionOptions({
+        changedPackagesRelativePath: true,
+      }),
+    );
+    expect(await action.run()).toEqual({
+      changedPackages: ["src/package1", "src/package2"],
     });
   });
 
@@ -82,35 +124,11 @@ describe("Action tests", () => {
           path.join(dataPath, "independent"),
         ],
         packageDependenciesResolutionMethod: "poetry-path",
+        rootPath: dataPath,
       }),
     );
     expect(await action.run()).toEqual({
       changedPackages: [path.join(dataPath, "parent"), path.join(dataPath, "child"), path.join(dataPath, "grandchild")],
-    });
-  });
-
-  test("runs with method: poetry-path and relative paths", async () => {
-    const absoluteDataPath = poetryPathDefaultDataPath;
-    const relativeDataPath = path.relative(projectRootPath, absoluteDataPath);
-
-    const action = Action.fromOptions(
-      createActionOptions({
-        changedFiles: [path.join(relativeDataPath, "parent/file.ts")],
-        allPackages: [
-          path.join(relativeDataPath, "parent"),
-          path.join(relativeDataPath, "child"),
-          path.join(relativeDataPath, "grandchild"),
-          path.join(relativeDataPath, "independent"),
-        ],
-        packageDependenciesResolutionMethod: "poetry-path",
-      }),
-    );
-    expect(await action.run()).toEqual({
-      changedPackages: [
-        path.join(absoluteDataPath, "parent"),
-        path.join(absoluteDataPath, "child"),
-        path.join(absoluteDataPath, "grandchild"),
-      ],
     });
   });
 
@@ -126,6 +144,7 @@ describe("Action tests", () => {
           "tool.poetry.group.group1.dependencies",
           "tool.poetry.group.group2.dependencies",
         ],
+        rootPath: dataPath,
       }),
     );
     expect(await action.run()).toEqual({
@@ -141,6 +160,7 @@ describe("Action tests", () => {
         changedFiles: [path.join(dataPath, "package1/file.ts")],
         allPackages: [path.join(dataPath, "package1"), path.join(dataPath, "package2")],
         packageDependenciesResolutionMethod: "poetry-path",
+        rootPath: dataPath,
       }),
     );
 
@@ -150,12 +170,18 @@ describe("Action tests", () => {
   });
 
   test("runs with method: poetry-path and no changed packages", async () => {
+    const dataPath = poetryPathDefaultDataPath;
+
     const action = Action.fromOptions(
       createActionOptions({
         changedFiles: [],
-        allPackages: [path.join(poetryPathDefaultDataPath, "parent")],
+        allPackages: [path.join(dataPath, "parent")],
         packageDependenciesResolutionMethod: "poetry-path",
+        rootPath: dataPath,
       }),
     );
+    expect(await action.run()).toEqual({
+      changedPackages: [],
+    });
   });
 });
