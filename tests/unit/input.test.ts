@@ -7,7 +7,8 @@ const defaultRawInput = {
   changedFilesSeparator: "\n",
   allPackages: "package1\npackage2",
   allPackagesSeparator: "\n",
-  changedPackagesSeparator: "\n",
+  changedPackagesFormat: "list",
+  changedPackagesListSeparator: "\n",
   packageDependenciesResolutionMethod: "none",
   poetryPathDependenciesGroups: "group1\ngroup2",
   poetryPathDependenciesGroupsSeparator: "\n",
@@ -25,7 +26,8 @@ describe("Input tests", () => {
     expect(parseActionInput(createRawInput())).toEqual({
       changedFiles: ["package1/file.ts", "package2/file.ts"],
       allPackages: ["package1", "package2"],
-      changedPackagesSeparator: "\n",
+      changedPackagesFormat: "list",
+      changedPackagesListSeparator: "\n",
       packageDependenciesResolutionMethod: "none",
       poetryPathDependenciesGroups: ["group1", "group2"],
     });

@@ -29,9 +29,17 @@ inputs:
       Separator to split all packages.
     required: true
     default: "\n"
-  changed-packages-separator:
+  changed-packages-format:
     description: |
-      Separator to split changed packages.
+      Format to return changed packages. Possible values:
+        - `list` - list of changed packages
+        - `json` - JSON object with changed packages
+    required: true
+    default: "list"
+  changed-packages-list-separator:
+    description: |
+      Used only if `changed-packages-format` is `list`.
+      Separator to split changed packages list.
     required: true
     default: "\n"
   package-dependencies-resolution-method:

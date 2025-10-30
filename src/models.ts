@@ -12,3 +12,14 @@ export const parsePackageDependenciesResolutionMethod = (
   }
   return value as PackageDependenciesResolutionMethodLiteral;
 };
+
+export const changedPackagesFormats = ["list", "json"] as const;
+export type ChangedPackagesFormatLiteral = (typeof changedPackagesFormats)[number];
+export const parseChangedPackagesFormat = (value: string | undefined): ChangedPackagesFormatLiteral => {
+  value = parseNonEmptyString(value);
+
+  if (!changedPackagesFormats.includes(value as ChangedPackagesFormatLiteral)) {
+    throw new Error(`Invalid changed packages format: ${value}`);
+  }
+  return value as ChangedPackagesFormatLiteral;
+};

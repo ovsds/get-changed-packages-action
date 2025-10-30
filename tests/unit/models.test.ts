@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { parsePackageDependenciesResolutionMethod } from "../../src/models";
+import { parsePackageDependenciesResolutionMethod, parseChangedPackagesFormat } from "../../src/models";
 
 describe("parsePackageDependenciesResolutionMethod", () => {
   it("should return the package dependencies resolution method", () => {
@@ -11,5 +11,15 @@ describe("parsePackageDependenciesResolutionMethod", () => {
     expect(() => parsePackageDependenciesResolutionMethod("invalid")).toThrow(
       "Invalid package dependencies resolution method: invalid",
     );
+  });
+});
+
+describe("parseChangedPackagesFormat", () => {
+  it("should return the changed packages format", () => {
+    expect(parseChangedPackagesFormat("list")).toBe("list");
+  });
+
+  it("should throw an error if the changed packages format is invalid", () => {
+    expect(() => parseChangedPackagesFormat("invalid")).toThrow("Invalid changed packages format: invalid");
   });
 });
