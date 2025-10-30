@@ -198,7 +198,8 @@ function parseActionInput(raw) {
     return {
         changedFiles: (0, parse_1.parseListOfStrings)(raw.changedFiles, changedFilesSeparator),
         allPackages: (0, parse_1.parseListOfStrings)(raw.allPackages, allPackagesSeparator),
-        changedPackagesSeparator: (0, parse_1.parseNonEmptyString)(raw.changedPackagesSeparator),
+        changedPackagesFormat: (0, models_1.parseChangedPackagesFormat)(raw.changedPackagesFormat),
+        changedPackagesListSeparator: (0, parse_1.parseNonEmptyString)(raw.changedPackagesListSeparator),
         packageDependenciesResolutionMethod: (0, models_1.parsePackageDependenciesResolutionMethod)(raw.packageDependenciesResolutionMethod),
         poetryPathDependenciesGroups: (0, parse_1.parseListOfStrings)(raw.poetryPathDependenciesGroups, poetryPathDependenciesGroupsSeparator),
     };
@@ -231,7 +232,11 @@ function getActionInput() {
         changedFilesSeparator: (0, core_1.getInput)("changed-files-separator", { trimWhitespace: false, required: true }),
         allPackages: (0, core_1.getInput)("all-packages", { required: true }),
         allPackagesSeparator: (0, core_1.getInput)("all-packages-separator", { trimWhitespace: false, required: true }),
-        changedPackagesSeparator: (0, core_1.getInput)("changed-packages-separator", { trimWhitespace: false, required: true }),
+        changedPackagesFormat: (0, core_1.getInput)("changed-packages-format", { required: true }),
+        changedPackagesListSeparator: (0, core_1.getInput)("changed-packages-list-separator", {
+            trimWhitespace: false,
+            required: true,
+        }),
         packageDependenciesResolutionMethod: (0, core_1.getInput)("package-dependencies-resolution-method", { required: true }),
         poetryPathDependenciesGroups: (0, core_1.getInput)("poetry-path-dependencies-groups", { required: true }),
         poetryPathDependenciesGroupsSeparator: (0, core_1.getInput)("poetry-path-dependencies-groups-separator", {
@@ -240,16 +245,21 @@ function getActionInput() {
         }),
     });
 }
-function setActionOutput(actionResult, changedPackagesSeparator) {
+function setActionOutput(actionResult, changedPackagesFormat, changedPackagesListSeparator) {
     (0, core_1.info)(`Action result: ${JSON.stringify(actionResult)}`);
-    (0, core_1.setOutput)("changed-packages", actionResult.changedPackages.join(changedPackagesSeparator));
+    if (changedPackagesFormat === "list") {
+        (0, core_1.setOutput)("changed-packages", actionResult.changedPackages.join(changedPackagesListSeparator));
+    }
+    else {
+        (0, core_1.setOutput)("changed-packages", JSON.stringify(actionResult.changedPackages));
+    }
 }
 function _main() {
     return __awaiter(this, void 0, void 0, function* () {
         const actionInput = getActionInput();
         const actionInstance = action_1.Action.fromOptions(Object.assign(Object.assign({}, actionInput), { logger: core_1.info }));
         const actionResult = yield actionInstance.run();
-        setActionOutput(actionResult, actionInput.changedPackagesSeparator);
+        setActionOutput(actionResult, actionInput.changedPackagesFormat, actionInput.changedPackagesListSeparator);
     });
 }
 function main() {
@@ -278,7 +288,7 @@ main();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parsePackageDependenciesResolutionMethod = exports.packageDependenciesResolutionMethods = void 0;
+exports.parseChangedPackagesFormat = exports.changedPackagesFormats = exports.parsePackageDependenciesResolutionMethod = exports.packageDependenciesResolutionMethods = void 0;
 const parse_1 = __nccwpck_require__(789);
 exports.packageDependenciesResolutionMethods = ["none", "all", "poetry-path"];
 const parsePackageDependenciesResolutionMethod = (value) => {
@@ -289,6 +299,15 @@ const parsePackageDependenciesResolutionMethod = (value) => {
     return value;
 };
 exports.parsePackageDependenciesResolutionMethod = parsePackageDependenciesResolutionMethod;
+exports.changedPackagesFormats = ["list", "json"];
+const parseChangedPackagesFormat = (value) => {
+    value = (0, parse_1.parseNonEmptyString)(value);
+    if (!exports.changedPackagesFormats.includes(value)) {
+        throw new Error(`Invalid changed packages format: ${value}`);
+    }
+    return value;
+};
+exports.parseChangedPackagesFormat = parseChangedPackagesFormat;
 
 
 /***/ }),

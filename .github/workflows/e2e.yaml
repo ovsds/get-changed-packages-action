@@ -142,7 +142,7 @@ jobs:
             ${{ github.workspace }}/tests/data/default/src/package1
             ${{ github.workspace }}/tests/data/default/src/package2
 
-  e2e-changed-packages-separator:
+  e2e-changed-packages-list-separator:
     runs-on: ubuntu-latest
 
     permissions:
@@ -167,13 +167,45 @@ jobs:
             ./tests/data/default/src/package1
             ./tests/data/default/src/package2
             ./tests/data/default/src/package3
-          changed-packages-separator: ","
+          changed-packages-list-separator: ","
 
       - name: Assert changed-packages
         uses: nick-fields/assert-action@v2
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: ${{ github.workspace }}/tests/data/default/src/package1,${{ github.workspace }}/tests/data/default/src/package2
+
+  e2e-changed-packages-format-json:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Test Run
+        id: test-run
+        uses: ./
+        with:
+          changed-files: |
+            ./tests/data/default/src/package1/file.ts
+            ./tests/data/default/src/package2/subfolder/file.ts
+            ./tests/data/default/other/package4/file.ts
+            ./tests/data/default/other/package5/file.ts
+          all-packages: |
+            ./tests/data/default/src/package1
+            ./tests/data/default/src/package2
+            ./tests/data/default/src/package3
+          changed-packages-format: json
+
+      - name: Assert changed-packages
+        uses: nick-fields/assert-action@v2
+        with:
+          actual: ${{ steps.test-run.outputs.changed-packages }}
+          expected: |
+            ["${{ github.workspace }}/tests/data/default/src/package1","${{ github.workspace }}/tests/data/default/src/package2"]
 
   e2e-method-all:
     runs-on: ubuntu-latest
@@ -246,7 +278,8 @@ jobs:
       - e2e-all-packages-glob
       - e2e-changed-files-separator
       - e2e-all-packages-separator
-      - e2e-changed-packages-separator
+      - e2e-changed-packages-list-separator
+      - e2e-changed-packages-format-json
       - e2e-method-all
       - e2e-method-poetry-path
 
