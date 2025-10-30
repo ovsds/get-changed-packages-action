@@ -75,7 +75,8 @@ class Action {
     getPoetryPathPackageDependencies(packagePath) {
         const pyprojectTomlPath = path_1.default.join(packagePath, "pyproject.toml");
         if (!fs_1.default.existsSync(pyprojectTomlPath)) {
-            throw new Error(`${pyprojectTomlPath} not found`);
+            this.options.logger(`WARNING: ${pyprojectTomlPath} not found, assuming no dependencies...`);
+            return new Set();
         }
         const pyprojectToml = fs_1.default.readFileSync(pyprojectTomlPath, "utf-8");
         const pyprojectTomlJson = toml_1.default.parse(pyprojectToml);
@@ -116,6 +117,13 @@ class Action {
                 }
             }
         }
+        return dependencies;
+    }
+    getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages) {
+        if (changedPackages.length === 0) {
+            return [];
+        }
+        const dependencies = this.getPoetryPathDependenciesMapping(allPackages);
         this.options.logger(`Poetry path dependencies:`);
         for (const [dependencyPath, packagePaths] of dependencies.entries()) {
             this.options.logger(`${dependencyPath}:`);
@@ -124,10 +132,6 @@ class Action {
             }
         }
         this.options.logger("");
-        return dependencies;
-    }
-    getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages) {
-        const dependencies = this.getPoetryPathDependenciesMapping(allPackages);
         const result = new Set();
         const visitedPackages = new Set();
         const queue = [...changedPackages];
@@ -163,12 +167,15 @@ class Action {
     run() {
         return __awaiter(this, void 0, void 0, function* () {
             const allPackages = yield this.getAllPackages();
+            this.options.logger(`All packages:`);
+            this.options.logger(allPackages.join("\n"));
+            this.options.logger("");
             const changedPackages = this.getChangedPackages(allPackages);
-            this.options.logger(`Found ${changedPackages.length} changed packages:`);
+            this.options.logger(`Changed packages:`);
             this.options.logger(changedPackages.join("\n"));
             this.options.logger("");
             const changedPackagesWithDependencies = this.getChangedPackagesWithDependencies(changedPackages, allPackages);
-            this.options.logger(`Found ${changedPackagesWithDependencies.length} changed packages with dependencies:`);
+            this.options.logger(`Changed packages with dependencies:`);
             this.options.logger(changedPackagesWithDependencies.join("\n"));
             this.options.logger("");
             return {
