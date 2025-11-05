@@ -184,4 +184,30 @@ describe("Action tests", () => {
       changedPackages: [],
     });
   });
+
+  test("runs with method: poetry-all", async () => {
+    const dataPath = poetryPathDefaultDataPath;
+
+    const action = Action.fromOptions(
+      createActionOptions({
+        allPackages: [
+          path.join(dataPath, "parent"),
+          path.join(dataPath, "child"),
+          path.join(dataPath, "grandchild"),
+          path.join(dataPath, "independent"),
+          path.join(dataPath, "non_package"),
+        ],
+        packageDependenciesResolutionMethod: "poetry-all",
+        rootPath: dataPath,
+      }),
+    );
+    expect(await action.run()).toEqual({
+      changedPackages: [
+        path.join(dataPath, "parent"),
+        path.join(dataPath, "child"),
+        path.join(dataPath, "grandchild"),
+        path.join(dataPath, "independent"),
+      ],
+    });
+  });
 });

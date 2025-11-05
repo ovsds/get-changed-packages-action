@@ -159,6 +159,9 @@ class Action {
         }
         return Array.from(result);
     }
+    getChangedPackagesWithDependenciesForPoetryAll(changedPackages, allPackages) {
+        return allPackages.filter((packagePath) => fs_1.default.existsSync(path_1.default.join(packagePath, "pyproject.toml")));
+    }
     getChangedPackagesWithDependencies(changedPackages, allPackages) {
         switch (this.options.packageDependenciesResolutionMethod) {
             case "none":
@@ -167,6 +170,8 @@ class Action {
                 return allPackages;
             case "poetry-path":
                 return this.getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages);
+            case "poetry-all":
+                return this.getChangedPackagesWithDependenciesForPoetryAll(changedPackages, allPackages);
             default:
                 throw new Error(`Unsupported package dependencies resolution method: ${this.options.packageDependenciesResolutionMethod}`);
         }
@@ -313,7 +318,7 @@ main();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseChangedPackagesFormat = exports.changedPackagesFormats = exports.parsePackageDependenciesResolutionMethod = exports.packageDependenciesResolutionMethods = void 0;
 const parse_1 = __nccwpck_require__(789);
-exports.packageDependenciesResolutionMethods = ["none", "all", "poetry-path"];
+exports.packageDependenciesResolutionMethods = ["none", "all", "poetry-path", "poetry-all"];
 const parsePackageDependenciesResolutionMethod = (value) => {
     value = (0, parse_1.parseNonEmptyString)(value);
     if (!exports.packageDependenciesResolutionMethods.includes(value)) {
