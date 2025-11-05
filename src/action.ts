@@ -166,6 +166,10 @@ export class Action {
     return Array.from(result);
   }
 
+  private getChangedPackagesWithDependenciesForPoetryAll(changedPackages: string[], allPackages: string[]): string[] {
+    return allPackages.filter((packagePath) => fs.existsSync(path.join(packagePath, "pyproject.toml")));
+  }
+
   private getChangedPackagesWithDependencies(changedPackages: string[], allPackages: string[]): string[] {
     switch (this.options.packageDependenciesResolutionMethod) {
       case "none":
@@ -174,6 +178,8 @@ export class Action {
         return allPackages;
       case "poetry-path":
         return this.getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages);
+      case "poetry-all":
+        return this.getChangedPackagesWithDependenciesForPoetryAll(changedPackages, allPackages);
       default:
         throw new Error(
           `Unsupported package dependencies resolution method: ${this.options.packageDependenciesResolutionMethod}`,

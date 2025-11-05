@@ -54,6 +54,7 @@ inputs:
         - `none` - no dependencies resolution
         - `all` - all packages are considered changed
         - `poetry-path` - dependencies are resolved using path dependencies from `pyproject.toml`
+        - `poetry-all` - all packages, filtered by existence of `pyproject.toml` file in the package root directory
     required: true
     default: "none"
   poetry-path-dependencies-groups:
