@@ -110,6 +110,34 @@ jobs:
             ${{ github.workspace }}/tests/data/default/src/package1
             ${{ github.workspace }}/tests/data/default/src/package2
 
+  e2e-empty-changed-files:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Test Run
+        id: test-run
+        uses: ./
+        with:
+          changed-files: ""
+          all-packages: |
+            ./tests/data/default/src/package1
+            ./tests/data/default/src/package2
+          package-dependencies-resolution-method: all
+
+      - name: Assert changed-packages
+        uses: nick-fields/assert-action@v2
+        with:
+          actual: ${{ steps.test-run.outputs.changed-packages }}
+          expected: |
+            ${{ github.workspace }}/tests/data/default/src/package1
+            ${{ github.workspace }}/tests/data/default/src/package2
+
   e2e-all-packages-separator:
     runs-on: ubuntu-latest
 
