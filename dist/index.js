@@ -250,7 +250,7 @@ const action_1 = __nccwpck_require__(1536);
 const input_1 = __nccwpck_require__(2868);
 function getActionInput() {
     return (0, input_1.parseActionInput)({
-        changedFiles: (0, core_1.getInput)("changed-files", { required: true }),
+        changedFiles: (0, core_1.getInput)("changed-files", { required: false }),
         changedFilesSeparator: (0, core_1.getInput)("changed-files-separator", { trimWhitespace: false, required: true }),
         allPackages: (0, core_1.getInput)("all-packages", { required: true }),
         allPackagesSeparator: (0, core_1.getInput)("all-packages-separator", { trimWhitespace: false, required: true }),

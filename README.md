@@ -39,8 +39,7 @@ jobs:
 inputs:
   changed-files:
     description: |
-      List of changed files.
-    required: true
+      List of changed files. If empty, no changed files are considered.
   changed-files-separator:
     description: |
       Separator to split changed files.
