@@ -126,8 +126,21 @@ class Action {
         const relativePackagePath = this.getRelativePath(absolutePackagePath);
         return `${relativePackagePath} (${absolutePackagePath})`;
     }
+    filterPoetryPathPackages(packages) {
+        const result = new Set();
+        for (const packagePath of packages) {
+            if (fs_1.default.existsSync(path_1.default.join(packagePath, "pyproject.toml"))) {
+                result.add(packagePath);
+            }
+            else {
+                this.options.logger.warning(`${packagePath} does not have a pyproject.toml file, assuming not a poetry package...`);
+            }
+        }
+        return Array.from(result);
+    }
     getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages) {
-        if (changedPackages.length === 0) {
+        const filteredChangedPackages = this.filterPoetryPathPackages(changedPackages);
+        if (filteredChangedPackages.length === 0) {
             return [];
         }
         const dependencies = this.getPoetryPathDependenciesMapping(allPackages);
@@ -141,7 +154,7 @@ class Action {
         this.options.logger.endGroup();
         const result = new Set();
         const visitedPackages = new Set();
-        const queue = [...changedPackages];
+        const queue = [...filteredChangedPackages];
         while (queue.length > 0) {
             const currentPackagePath = queue.shift();
             if (!currentPackagePath) {
@@ -159,8 +172,8 @@ class Action {
         }
         return Array.from(result);
     }
-    getChangedPackagesWithDependenciesForPoetryAll(changedPackages, allPackages) {
-        return allPackages.filter((packagePath) => fs_1.default.existsSync(path_1.default.join(packagePath, "pyproject.toml")));
+    getChangedPackagesWithDependenciesForPoetryAll(allPackages) {
+        return this.filterPoetryPathPackages(allPackages);
     }
     getChangedPackagesWithDependencies(changedPackages, allPackages) {
         switch (this.options.packageDependenciesResolutionMethod) {
@@ -171,7 +184,7 @@ class Action {
             case "poetry-path":
                 return this.getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages);
             case "poetry-all":
-                return this.getChangedPackagesWithDependenciesForPoetryAll(changedPackages, allPackages);
+                return this.getChangedPackagesWithDependenciesForPoetryAll(allPackages);
             default:
                 throw new Error(`Unsupported package dependencies resolution method: ${this.options.packageDependenciesResolutionMethod}`);
         }

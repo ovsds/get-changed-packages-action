@@ -18,11 +18,7 @@ const defaultActionOptions = {
     path.join(defaultDataPath, "other/package4/file.ts"),
     path.join(defaultDataPath, "other/package5/file.ts"),
   ],
-  allPackages: [
-    path.join(defaultDataPath, "src/package1"),
-    path.join(defaultDataPath, "src/package2"),
-    path.join(defaultDataPath, "src/package3"),
-  ],
+  allPackages: [path.join(defaultDataPath, "src/*")],
   changedPackagesRelativePath: false,
   packageDependenciesResolutionMethod: "none" as PackageDependenciesResolutionMethodLiteral,
   poetryPathDependenciesGroups: ["tool.poetry.dependencies"],
@@ -73,11 +69,7 @@ describe("Action tests", () => {
           path.join(relativeDataPath, "other/package4/file.ts"),
           path.join(relativeDataPath, "other/package5/file.ts"),
         ],
-        allPackages: [
-          path.join(relativeDataPath, "src/package1"),
-          path.join(relativeDataPath, "src/package2"),
-          path.join(relativeDataPath, "src/package3"),
-        ],
+        allPackages: [path.join(relativeDataPath, "src/*")],
       }),
     );
     expect(await action.run()).toEqual({
@@ -116,13 +108,8 @@ describe("Action tests", () => {
 
     const action = Action.fromOptions(
       createActionOptions({
-        changedFiles: [path.join(dataPath, "parent/file.ts")],
-        allPackages: [
-          path.join(dataPath, "parent"),
-          path.join(dataPath, "child"),
-          path.join(dataPath, "grandchild"),
-          path.join(dataPath, "independent"),
-        ],
+        changedFiles: [path.join(dataPath, "parent/file.ts"), path.join(dataPath, "non_package/file")],
+        allPackages: [path.join(dataPath, "*")],
         packageDependenciesResolutionMethod: "poetry-path",
         rootPath: dataPath,
       }),
@@ -138,7 +125,7 @@ describe("Action tests", () => {
     const action = Action.fromOptions(
       createActionOptions({
         changedFiles: [path.join(dataPath, "parent/file.ts")],
-        allPackages: [path.join(dataPath, "parent"), path.join(dataPath, "child1"), path.join(dataPath, "child2")],
+        allPackages: [path.join(dataPath, "*")],
         packageDependenciesResolutionMethod: "poetry-path",
         poetryPathDependenciesGroups: [
           "tool.poetry.group.group1.dependencies",
@@ -158,7 +145,7 @@ describe("Action tests", () => {
     const action = Action.fromOptions(
       createActionOptions({
         changedFiles: [path.join(dataPath, "package1/file.ts")],
-        allPackages: [path.join(dataPath, "package1"), path.join(dataPath, "package2")],
+        allPackages: [path.join(dataPath, "*")],
         packageDependenciesResolutionMethod: "poetry-path",
         rootPath: dataPath,
       }),
@@ -190,23 +177,17 @@ describe("Action tests", () => {
 
     const action = Action.fromOptions(
       createActionOptions({
-        allPackages: [
-          path.join(dataPath, "parent"),
-          path.join(dataPath, "child"),
-          path.join(dataPath, "grandchild"),
-          path.join(dataPath, "independent"),
-          path.join(dataPath, "non_package"),
-        ],
+        allPackages: [path.join(dataPath, "*")],
         packageDependenciesResolutionMethod: "poetry-all",
         rootPath: dataPath,
       }),
     );
     expect(await action.run()).toEqual({
       changedPackages: [
-        path.join(dataPath, "parent"),
         path.join(dataPath, "child"),
         path.join(dataPath, "grandchild"),
         path.join(dataPath, "independent"),
+        path.join(dataPath, "parent"),
       ],
     });
   });
