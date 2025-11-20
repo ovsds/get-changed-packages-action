@@ -127,8 +127,23 @@ export class Action {
     return `${relativePackagePath} (${absolutePackagePath})`;
   }
 
+  private filterPoetryPathPackages(packages: string[]): string[] {
+    const result = new Set<string>();
+    for (const packagePath of packages) {
+      if (fs.existsSync(path.join(packagePath, "pyproject.toml"))) {
+        result.add(packagePath);
+      } else {
+        this.options.logger.warning(
+          `${packagePath} does not have a pyproject.toml file, assuming not a poetry package...`,
+        );
+      }
+    }
+    return Array.from(result);
+  }
+
   private getChangedPackagesWithDependenciesForPoetryPath(changedPackages: string[], allPackages: string[]): string[] {
-    if (changedPackages.length === 0) {
+    const filteredChangedPackages = this.filterPoetryPathPackages(changedPackages);
+    if (filteredChangedPackages.length === 0) {
       return [];
     }
 
@@ -146,7 +161,7 @@ export class Action {
     const result = new Set<string>();
     const visitedPackages = new Set<string>();
 
-    const queue = [...changedPackages];
+    const queue = [...filteredChangedPackages];
 
     while (queue.length > 0) {
       const currentPackagePath = queue.shift();
@@ -166,8 +181,8 @@ export class Action {
     return Array.from(result);
   }
 
-  private getChangedPackagesWithDependenciesForPoetryAll(changedPackages: string[], allPackages: string[]): string[] {
-    return allPackages.filter((packagePath) => fs.existsSync(path.join(packagePath, "pyproject.toml")));
+  private getChangedPackagesWithDependenciesForPoetryAll(allPackages: string[]): string[] {
+    return this.filterPoetryPathPackages(allPackages);
   }
 
   private getChangedPackagesWithDependencies(changedPackages: string[], allPackages: string[]): string[] {
@@ -179,7 +194,7 @@ export class Action {
       case "poetry-path":
         return this.getChangedPackagesWithDependenciesForPoetryPath(changedPackages, allPackages);
       case "poetry-all":
-        return this.getChangedPackagesWithDependenciesForPoetryAll(changedPackages, allPackages);
+        return this.getChangedPackagesWithDependenciesForPoetryAll(allPackages);
       default:
         throw new Error(
           `Unsupported package dependencies resolution method: ${this.options.packageDependenciesResolutionMethod}`,
