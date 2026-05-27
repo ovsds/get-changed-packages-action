@@ -10,6 +10,14 @@ inputs:
   changed-files:
     description: |
       List of changed files. If empty, no changed files are considered.
+      Mutually exclusive with `changed-files-file`.
+  changed-files-file:
+    description: |
+      Path to a file containing the list of changed files.
+      Useful when the list is too large to be passed as an input string
+      (GitHub Actions invokes container steps via `docker exec`, which is
+      subject to the host `ARG_MAX` limit on environment variables).
+      Mutually exclusive with `changed-files`.
   changed-files-separator:
     description: |
       Separator to split changed files.

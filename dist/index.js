@@ -217,20 +217,37 @@ exports.Action = Action;
 /***/ }),
 
 /***/ 2868:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseActionInput = parseActionInput;
+const fs_1 = __importDefault(__nccwpck_require__(9896));
 const parse_1 = __nccwpck_require__(789);
 const models_1 = __nccwpck_require__(6324);
+function resolveChangedFiles(raw, file) {
+    if (raw !== "" && file !== "") {
+        throw new Error("`changed-files` and `changed-files-file` inputs are mutually exclusive");
+    }
+    if (file === "") {
+        return raw;
+    }
+    if (!fs_1.default.existsSync(file)) {
+        throw new Error(`changed-files-file does not exist: ${file}`);
+    }
+    return fs_1.default.readFileSync(file, "utf-8");
+}
 function parseActionInput(raw) {
     const changedFilesSeparator = (0, parse_1.parseNonEmptyString)(raw.changedFilesSeparator);
     const allPackagesSeparator = (0, parse_1.parseNonEmptyString)(raw.allPackagesSeparator);
     const poetryPathDependenciesGroupsSeparator = (0, parse_1.parseNonEmptyString)(raw.poetryPathDependenciesGroupsSeparator);
+    const changedFiles = resolveChangedFiles(raw.changedFiles, raw.changedFilesFile);
     return {
-        changedFiles: (0, parse_1.parseListOfStrings)(raw.changedFiles, changedFilesSeparator),
+        changedFiles: (0, parse_1.parseListOfStrings)(changedFiles, changedFilesSeparator),
         allPackages: (0, parse_1.parseListOfStrings)(raw.allPackages, allPackagesSeparator),
         changedPackagesFormat: (0, models_1.parseChangedPackagesFormat)(raw.changedPackagesFormat),
         changedPackagesRelativePath: (0, parse_1.parseBoolean)(raw.changedPackagesRelativePath),
@@ -264,6 +281,7 @@ const input_1 = __nccwpck_require__(2868);
 function getActionInput() {
     return (0, input_1.parseActionInput)({
         changedFiles: (0, core_1.getInput)("changed-files", { required: false }),
+        changedFilesFile: (0, core_1.getInput)("changed-files-file", { required: false }),
         changedFilesSeparator: (0, core_1.getInput)("changed-files-separator", { trimWhitespace: false, required: true }),
         allPackages: (0, core_1.getInput)("all-packages", { required: true }),
         allPackagesSeparator: (0, core_1.getInput)("all-packages-separator", { trimWhitespace: false, required: true }),

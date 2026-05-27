@@ -7,6 +7,7 @@ import { ChangedPackagesFormatLiteral } from "./models";
 function getActionInput(): ActionInput {
   return parseActionInput({
     changedFiles: getInput("changed-files", { required: false }),
+    changedFilesFile: getInput("changed-files-file", { required: false }),
     changedFilesSeparator: getInput("changed-files-separator", { trimWhitespace: false, required: true }),
     allPackages: getInput("all-packages", { required: true }),
     allPackagesSeparator: getInput("all-packages-separator", { trimWhitespace: false, required: true }),
