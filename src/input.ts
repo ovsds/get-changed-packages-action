@@ -1,3 +1,5 @@
+import fs from "fs";
+
 import { parseListOfStrings, parseNonEmptyString, parseBoolean } from "./utils/parse";
 import {
   parsePackageDependenciesResolutionMethod,
@@ -8,6 +10,7 @@ import {
 
 export interface RawActionInput {
   changedFiles: string;
+  changedFilesFile: string;
   changedFilesSeparator: string;
   allPackages: string;
   allPackagesSeparator: string;
@@ -29,13 +32,28 @@ export interface ActionInput {
   poetryPathDependenciesGroups: string[];
 }
 
+function resolveChangedFiles(raw: string, file: string): string {
+  if (raw !== "" && file !== "") {
+    throw new Error("`changed-files` and `changed-files-file` inputs are mutually exclusive");
+  }
+  if (file === "") {
+    return raw;
+  }
+  if (!fs.existsSync(file)) {
+    throw new Error(`changed-files-file does not exist: ${file}`);
+  }
+  return fs.readFileSync(file, "utf-8");
+}
+
 export function parseActionInput(raw: RawActionInput): ActionInput {
   const changedFilesSeparator = parseNonEmptyString(raw.changedFilesSeparator);
   const allPackagesSeparator = parseNonEmptyString(raw.allPackagesSeparator);
   const poetryPathDependenciesGroupsSeparator = parseNonEmptyString(raw.poetryPathDependenciesGroupsSeparator);
 
+  const changedFiles = resolveChangedFiles(raw.changedFiles, raw.changedFilesFile);
+
   return {
-    changedFiles: parseListOfStrings(raw.changedFiles, changedFilesSeparator),
+    changedFiles: parseListOfStrings(changedFiles, changedFilesSeparator),
     allPackages: parseListOfStrings(raw.allPackages, allPackagesSeparator),
     changedPackagesFormat: parseChangedPackagesFormat(raw.changedPackagesFormat),
     changedPackagesRelativePath: parseBoolean(raw.changedPackagesRelativePath),
