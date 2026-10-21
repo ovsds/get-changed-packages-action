@@ -1,0 +1,6 @@
+[tool.poetry.dependencies]
+parent = { path = "../parent" }
+python = "*"
+
+[tool.hypothesis]
+seed = 9007199254740993

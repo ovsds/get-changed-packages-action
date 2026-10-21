@@ -36583,7 +36583,8 @@ class Action {
             return new Set();
         }
         const pyprojectToml = external_fs_default().readFileSync(pyprojectTomlPath, "utf-8");
-        const pyprojectTomlJson = toml_default().parse(pyprojectToml);
+        // Integers beyond the safe range would throw without BigInt; only string paths are read
+        const pyprojectTomlJson = toml_default().parse(pyprojectToml, { bigint: true });
         const result = new Set();
         for (const group of this.options.poetryPathDependenciesGroups) {
             let dependencies = pyprojectTomlJson;
