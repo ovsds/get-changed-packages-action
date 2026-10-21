@@ -8,5 +8,8 @@
 # Dependencies
 node_modules/
 
+# Environment
+.env
+
 # Build files
 lib/**/*

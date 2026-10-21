@@ -20,13 +20,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/default/src/package1/file.ts
@@ -39,7 +39,7 @@ jobs:
             ./tests/data/default/src/package3
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -54,13 +54,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/default/src/package1/file.ts
@@ -72,7 +72,7 @@ jobs:
           all-packages-separator: ","
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -87,13 +87,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: ./tests/data/default/src/package1/file.ts,./tests/data/default/src/package2/subfolder/file.ts,./tests/data/default/other/package4/file.ts,./tests/data/default/other/package5/file.ts
           changed-files-separator: ","
@@ -103,7 +103,7 @@ jobs:
             ./tests/data/default/src/package3
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -116,13 +116,13 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: ""
           all-packages: |
@@ -131,7 +131,7 @@ jobs:
           package-dependencies-resolution-method: all
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -146,7 +146,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -162,7 +162,7 @@ jobs:
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files-file: ./tmp/changed-files.txt
           all-packages: |
@@ -171,7 +171,7 @@ jobs:
             ./tests/data/default/src/package3
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -186,13 +186,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/default/src/package1/file.ts
@@ -203,7 +203,7 @@ jobs:
           all-packages-separator: ","
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -216,13 +216,13 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/default/src/package1/file.ts
@@ -236,7 +236,7 @@ jobs:
           changed-packages-relative-path: true
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -251,13 +251,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/default/src/package1/file.ts
@@ -271,7 +271,7 @@ jobs:
           changed-packages-list-separator: ","
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: ${{ github.workspace }}/tests/data/default/src/package1,${{ github.workspace }}/tests/data/default/src/package2
@@ -282,13 +282,13 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/default/src/package1/file.ts
@@ -302,7 +302,7 @@ jobs:
           changed-packages-format: json
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -316,13 +316,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/default/src/package1/file.ts
@@ -331,7 +331,7 @@ jobs:
           package-dependencies-resolution-method: all
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -347,13 +347,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/poetry-path/default/parent/file.ts
@@ -363,7 +363,7 @@ jobs:
           package-dependencies-resolution-method: poetry-path
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -377,13 +377,13 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Test Run
         id: test-run
-        uses: ./
+        uses: $/
         with:
           changed-files: |
             ./tests/data/poetry-path/default/parent/file.ts
@@ -393,7 +393,7 @@ jobs:
           package-dependencies-resolution-method: poetry-all
 
       - name: Assert changed-packages
-        uses: nick-fields/assert-action@v2
+        uses: nick-fields/assert-action@0efd6166067d9c59d89c710fab4f79fb066f8985 # v4.0.1
         with:
           actual: ${{ steps.test-run.outputs.changed-packages }}
           expected: |
@@ -405,6 +405,8 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     if: always() && !cancelled()
+
+    permissions: {}
 
     needs:
       - e2e-default
@@ -420,7 +422,7 @@ jobs:
 
     steps:
       - name: Collect Results
-        uses: ovsds/collect-needs-result-action@v1
+        uses: ovsds/collect-needs-result-action@12190e2a1bfe85d9c024f190a3833973e97998f8 # v1.0.0
         with:
           needs_json: ${{ toJson(needs) }}
           skip_allowed: false
