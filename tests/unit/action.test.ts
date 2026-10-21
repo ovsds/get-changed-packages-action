@@ -10,6 +10,7 @@ const defaultDataPath = path.join(projectRootPath, "tests/data/default");
 const poetryPathDefaultDataPath = path.join(projectRootPath, "tests/data/poetry-path/default");
 const poetryPathNonDefaultGroupDataPath = path.join(projectRootPath, "tests/data/poetry-path/non-default-group");
 const poetryPathCircularDataPath = path.join(projectRootPath, "tests/data/poetry-path/circular");
+const poetryPathLargeIntegerDataPath = path.join(projectRootPath, "tests/data/poetry-path/large-integer");
 
 const defaultActionOptions = {
   changedFiles: [
@@ -153,6 +154,23 @@ describe("Action tests", () => {
 
     expect(await action.run()).toEqual({
       changedPackages: [path.join(dataPath, "package1"), path.join(dataPath, "package2")],
+    });
+  });
+
+  test("runs with method: poetry-path and an integer beyond the safe range", async () => {
+    const dataPath = poetryPathLargeIntegerDataPath;
+
+    const action = Action.fromOptions(
+      createActionOptions({
+        changedFiles: [path.join(dataPath, "parent/file.ts")],
+        allPackages: [path.join(dataPath, "*")],
+        packageDependenciesResolutionMethod: "poetry-path",
+        rootPath: dataPath,
+      }),
+    );
+
+    expect(await action.run()).toEqual({
+      changedPackages: [path.join(dataPath, "parent"), path.join(dataPath, "child")],
     });
   });
 

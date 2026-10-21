@@ -72,7 +72,8 @@ export class Action {
     }
 
     const pyprojectToml = fs.readFileSync(pyprojectTomlPath, "utf-8");
-    const pyprojectTomlJson = toml.parse(pyprojectToml);
+    // Integers beyond the safe range would throw without BigInt; only string paths are read
+    const pyprojectTomlJson = toml.parse(pyprojectToml, { bigint: true });
 
     const result = new Set<string>();
 
